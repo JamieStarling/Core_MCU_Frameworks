@@ -3,7 +3,7 @@
 * Filename              :   gpio_analog.h
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/25
-* Version               :   1.0.0
+* Version               :   1.0.1
 * Compiler              :   XC8
 * Target                :   Microchip PIC16F series
 * Copyright             :   © 2024 Jamie Starling
@@ -43,6 +43,7 @@
 *
 *****************************************************************************/
 
+
 #ifndef _CORE16F_GPIO_ANALOG_H
 #define _CORE16F_GPIO_ANALOG_H
 /******************************************************************************
@@ -50,16 +51,27 @@
 *******************************************************************************/
 #include "../../core16F.h"
 
+/******************************************************************************
+***** Analog Interface
+*******************************************************************************/
+typedef struct {
+  void (*Initialize)(AnalogChannelSelectEnum_t Channel);   
+  void (*SelectChannel)(AnalogChannelSelectEnum_t Channel);
+  void (*PinSet)(GPIO_Ports_t PortPin, AnalogChannelSelectEnum_t Channel);
+  uint16_t (*ReadChannel)(void);
+}GPIO_Analog_Interface_t;
+
+extern const GPIO_Analog_Interface_t GPIO_Analog;
 
 /******************************************************************************
 * Function Prototypes
 *******************************************************************************/
-
 void GPIO_Analog_Init(AnalogChannelSelectEnum_t Channel);
 void GPIO_Analog_SelectChannel(AnalogChannelSelectEnum_t Channel);
 void GPIO_Analog_SetPortPin(GPIO_Ports_t PortPin, AnalogChannelSelectEnum_t Channel);
 uint16_t GPIO_Analog_ReadChannel();
 
 #endif /*_CORE16F_GPIO_ANALOG_H*/
+
 
 /*** End of File **************************************************************/

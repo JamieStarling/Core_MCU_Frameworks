@@ -1,0 +1,23 @@
+/***************  CHANGE LIST *************************************************
+
+Date        Version     Author          Description 
+2024/04/25  1.0.0       Jamie Starling  Initial Version
+2024/09/11  1.0.1       Jamie Starling  Changed ESUART1 to SERIAL1
+
+2024/09/11  1.0.1       Jamie Starling  Added ISR_Enable_System_Default - to isr_control to enable a config default isr control
+2024/09/11  1.0.1       Jamie Starling  Change serial1_isr enable for TX and RC to use ISR_Enable_System_Default
+2024/09/13  1.0.1       Jamie Starling  Added Interface to GPIO : GPIO
+2024/09/13  1.0.1       Jamie Starling  Added Interface to GPIO Analog : GPIO_Analog
+2024/09/13  1.0.1       Jamie Starling  Added Interface to Core System : CORE.Initialize
+2024/09/13  1.0.1       Jamie Starling  Added Interface to Core System : CORE.Delay_MS
+2024/09/13  1.0.1       Jamie Starling  Added Interface to PPS : PPS
+2024/09/13  1.0.1       Jamie Starling  Added Interface to PWM3 : PWM3
+2024/09/13  1.0.1       Jamie Starling  Added Interface to PWM4 : PWM4
+2024/09/13  1.0.1       Jamie Starling  Added Interface to PWM5 : PWM5
+2024/09/13  1.0.1       Jamie Starling  Added Interface to PWM6 : PWM6
+2024/09/13  1.0.2       Jamie Starling  Added Interface to SERIAL1 : SERIAL1
+2024/09/13  1.0.1       Jamie Starling  Added Interface to TMR0 : TIMER0
+2024/09/13  1.0.1       Jamie Starling  Added Interface to TMR1 : TIMER1
+2024/09/13  1.0.1       Jamie Starling  Added Interface to TMR2 : TIMER2
+2024/09/24  1.0.1       Jamie Starling  Added Interface to I2C1 : I2C1_MASTER
+2024/09/24  1.0.1       Jamie Starling  Added Interface to ONE WIRE : ONE_WIRE

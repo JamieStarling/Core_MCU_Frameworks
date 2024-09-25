@@ -3,7 +3,7 @@
 * Filename              :   tmr1.c
 * Author                :   Jamie Starling
 * Origin Date           :   2024/09/08
-* Version               :   1.0.0
+* Version               :   1.0.1
 * Compiler              :   XC8 
 * Target                :   Microchip PIC16F series 
 * Copyright             :   © 2024 Jamie Starling
@@ -48,6 +48,20 @@
 *******************************************************************************/
 #include "tmr1.h"
 
+/******************************************************************************
+* TMR1 Interface
+*******************************************************************************/
+const TMR1_Interface_t TIMER1 = {
+  .Enable = &TMR1_Enable,
+  .Set_16bitModeRW = &TMR1_16bit_ReadWrite_Mode,
+  .Set_ClockSource =  &TMR1_Set_Clock_Source,  
+  .Set_PrescalerRate =  &TMR1_Set_Prescaler_Rate,
+  .Read_8bitValue =  &TMR1_Get_8bit_Value,
+  .Read_16bitValue =  &TMR1_Get_16bit_Value,
+  .Clear_InterruptFlag =  &TMR1_Clear_Interrupt_Flag,
+  .Set_InterruptEnable =  &TMR1_Enable_Interrupt,
+  .IsInterruptFlagSet =  &TMR1_Interrupt_Flag_Set
+};
 
 /******************************************************************************
 * Functions

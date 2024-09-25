@@ -124,4 +124,14 @@ void ISR_Peripheral_Interrupt(LogicEnum_t setState)
   INTCONbits.PEIE = setState;
 }
 
+
+void ISR_Enable_System_Default(void)
+{  
+    #ifdef _CORE16F_ENABLE_PERIPHERAL_INTERRUPT
+    ISR_Peripheral_Interrupt(ENABLED);
+    #endif /*_CORE16F_ENABLE_PERIPHERAL_INTERRUPT*/
+    
+    ISR_Global_Interrupt(ENABLED);  
+}
+
 /*** End of File **************************************************************/

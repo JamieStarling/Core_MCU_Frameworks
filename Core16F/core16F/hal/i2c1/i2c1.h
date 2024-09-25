@@ -3,7 +3,7 @@
 * Filename              :   i2c.h
 * Author                :   Jamie Starling
 * Origin Date           :   2024/08/15
-* Version               :   1.0.0
+* Version               :   1.0.1
 * Compiler              :   XC8
 * Target                :   Microchip PIC16F series
 * Copyright             :   © 2024 Jamie Starling
@@ -50,9 +50,6 @@
 *******************************************************************************/
 #include "../../core16F.h"
 
-/******************************************************************************
-****** Configuration
-*******************************************************************************/
 
 /******************************************************************************
  * \brief I2C Return Codes
@@ -83,6 +80,23 @@ typedef enum
   I2C_ADDRESS_WRITE_MODE = 0,
   I2C_ADDRESS_READ_MODE = 1  
 }I2C_Address_Mode_Enum_t;
+
+
+/******************************************************************************
+***** I2C1 Interface
+*******************************************************************************/
+typedef struct {
+  void (*Initialize)(void);
+  void (*WriteStart)(void);
+  I2C_Status_Enum_t (*WriteAddress)(uint8_t address, I2C_Address_Mode_Enum_t address_mode);
+  void (*WriteStop)(void);
+  I2C_Status_Enum_t (*WriteByte)(uint8_t data);
+  I2C_Status_Enum_t (*WriteBlock)(uint8_t *datablock, uint8_t data_length);
+  uint8_t (*ReadByte)(void);
+  I2C_Status_Enum_t (*ReadBlock)(uint8_t *datablock, uint8_t data_length);  
+}I2C1_Master_Interface_t;
+
+extern const I2C1_Master_Interface_t I2C1_MASTER;
 
 
 /******************************************************************************

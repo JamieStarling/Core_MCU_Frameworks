@@ -50,13 +50,13 @@
 *******************************************************************************/
 void main(void)
 {
-  CORE16F_init(); //Init for the Core8 System
- 
+  CORE.Initialize(); //Init for the Core8 System
+  GPIO.ModeSet(PORTA_0,INPUT);
  
   while(1) //Program loop
     {      
-    
-    
+      GPIO.PinToggle(PORTA_0);
+      CORE.Delay_MS(1000);    
     }
 }
 

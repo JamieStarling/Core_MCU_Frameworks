@@ -3,7 +3,7 @@
 * Filename              :   pwm3.h
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/25
-* Version               :   1.0.0
+* Version               :   1.0.1
 * Compiler              :   XC8
 * Target                :   Microchip PIC16F series
 * Copyright             :   © 2024 Jamie Starling
@@ -50,6 +50,18 @@
 * Includes
 *******************************************************************************/
 #include "../../core16F.h"
+
+/******************************************************************************
+***** PWM Interface
+*******************************************************************************/
+typedef struct {
+  void (*Initialize)(GPIO_Ports_t PortPin,PWM_ConfigEnum_t PWM_Config);   
+  void (*Output)(LogicEnum_t setState);
+  void (*DutyCycle)(uint16_t dutyValue);
+}PWM3_Interface_t;
+
+extern const PWM3_Interface_t PWM3;
+
 
 /******************************************************************************
 * Function Prototypes

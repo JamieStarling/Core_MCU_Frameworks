@@ -3,7 +3,7 @@
 * Filename              :   tmr2.c
 * Author                :   Jamie Starling
 * Origin Date           :   2024/09/09
-* Version               :   1.0.0
+* Version               :   1.0.1
 * Compiler              :   XC8 
 * Target                :   Microchip PIC16F series  
 * Copyright             :   © 2024 Jamie Starling
@@ -47,6 +47,21 @@
 * Includes
 *******************************************************************************/
 #include "tmr2.h"
+
+/******************************************************************************
+* TMR2 Interface
+*******************************************************************************/
+const TMR2_Interface_t TIMER2 = {
+  .Enable = &TMR2_Enable,
+  .Set_OutputPostscaler = &TMR2_Set_Output_Postscaler,
+  .Set_ClockSource =  &TMR2_Set_Clock_Source,  
+  .Set_PrescalerRate =  &TMR2_Set_Prescaler_Rate,
+  .Read_8bitValue =  &TMR2_Get_8bit_Value,
+  .Clear_InterruptFlag =  &TMR2_Clear_Interrupt_Flag,
+  .Set_InterruptEnable =  &TMR2_Enable_Interrupt,
+  .IsInterruptFlagSet =  &TMR2_Interrupt_Flag_Set
+};
+
 
 /******************************************************************************
 * Functions

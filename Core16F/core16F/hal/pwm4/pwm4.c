@@ -3,7 +3,7 @@
 * Filename              :   pwm4.c
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/24
-* Version               :   1.0.0
+* Version               :   1.0.1
 * Compiler              :   XC8
 * Target                :    
 * Copyright             :   Jamie Starling
@@ -50,6 +50,15 @@
 #include "pwm4.h"
 #include "../pps/pps.h"
 #include "../tmr2/tmr2.h"
+
+/******************************************************************************
+***** PWM Interface
+*******************************************************************************/
+const PWM4_Interface_t PWM4 = {
+  .Initialize = &PWM4_Init,
+  .Output = &PWM4_Output_Enable,
+  .DutyCycle = &PWM4_Set_DutyCycle  
+};
 
 /******************************************************************************
 * Functions

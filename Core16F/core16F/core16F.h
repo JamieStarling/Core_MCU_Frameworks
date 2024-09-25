@@ -3,7 +3,7 @@
 * Filename              :   core16F.h
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/25
-* Version               :   1.0.0
+* Version               :   1.0.1
 * Compiler              :   XC8
 * Target                :   Microchip PIC16F series
 * Copyright             :   © 2024 Jamie Starling
@@ -122,57 +122,56 @@
 /******************************************************************************
 * Enable TMR1 Functions
 *******************************************************************************/
-#define _CORE16F_HAL_TMR1_ENABLE
+//#define _CORE16F_HAL_TMR1_ENABLE
 
 /******************************************************************************
 * Enable TMR2 Functions
 * If using PWM TMR2 is automatically enabled. 
 *******************************************************************************/
-#define _CORE16F_HAL_TMR2_ENABLE
+//#define _CORE16F_HAL_TMR2_ENABLE
 
 /******************************************************************************
 * Enable Core8 - GPIO Analog Functions
 *******************************************************************************/
-#define _CORE16F_HAL_GPIO_ANALOG_ENABLE
+//#define _CORE16F_HAL_GPIO_ANALOG_ENABLE
 
 /******************************************************************************
-* Enable Core8 - EUSART1 Functions
-* Provides support for the Enhanced Universal Synchronous Asynchronous Receiver Transmitter (EUSART1)
+* Enable Core8 - SERIAL1 Functions
+* Provides support for the Enhanced Universal Synchronous Asynchronous Receiver Transmitter (SERIAL1)
 * for serial communication.
 *******************************************************************************/
-#define _CORE16F_HAL_EUSART1_ENABLE
-#define _CORE16F_HAL_EUSART1_ISR_ENABLE
-
+//#define _CORE16F_HAL_SERIAL1_ENABLE
+//#define _CORE16F_HAL_SERIAL1_ISR_ENABLE
 
 /******************************************************************************
 * Enable Core8 - PWM3 Functions
 *******************************************************************************/
-#define _CORE16F_HAL_PWM3_ENABLE
+//#define _CORE16F_HAL_PWM3_ENABLE
 
 /******************************************************************************
 * Enable Core8 - PWM4 Functions
 *******************************************************************************/
-#define _CORE16F_HAL_PWM4_ENABLE
+//#define _CORE16F_HAL_PWM4_ENABLE
 
 /******************************************************************************
 * Enable Core8 - PWM5 Functions
 *******************************************************************************/
-#define _CORE16F_HAL_PWM5_ENABLE
+//#define _CORE16F_HAL_PWM5_ENABLE
 
 /******************************************************************************
 * Enable Core8 - PWM6 Functions
 *******************************************************************************/
-#define _CORE16F_HAL_PWM6_ENABLE
+//#define _CORE16F_HAL_PWM6_ENABLE
 
 /******************************************************************************
 * Enable Core8 - I2C Functions
 *******************************************************************************/
-#define _CORE16F_HAL_I2C_ENABLE
+//#define _CORE16F_HAL_I2C_ENABLE
 
 /******************************************************************************
 * Enable Core8 - One Wire Functions
 *******************************************************************************/
-#define _CORE16F_HAL_ONE_WIRE_ENABLE
+//#define _CORE16F_HAL_ONE_WIRE_ENABLE
 
 
 /******************************************************************************
@@ -198,16 +197,15 @@
 #include "core16F_system/timer/isr_core16F_system_timer.h"
 #include "isr/isr_control.h"
 #include "hal/tmr0/tmr0.h"
-#endif
-
-//Include system delay functions if Enabled
+//Include system delay functions if Enabled - Requires System Timer
 #ifdef _CORE16F_SYSTEM_INCLUDE_DELAYS_ENABLE
 #include "core16F_system/delays/delays.h"
-#endif
+#endif //_CORE16F_SYSTEM_INCLUDE_DELAYS_ENABLE
+#endif //_CORE16F_SYSTEM_TIMER_ENABLE
 
 //Include GPIO Analog Functions - If Enabled
 #ifdef _CORE16F_HAL_GPIO_ANALOG_ENABLE
-#include "hal/gpio/gpio_analog.h"
+//#include "hal/gpio/gpio_analog.h"
 #endif
 
 /****TIMER 0******/
@@ -223,14 +221,14 @@
 #include "hal/tmr2/tmr2.h"
 #endif
 
-/******EUSART1*********/
-#ifdef _CORE16F_HAL_EUSART1_ENABLE
-#include "hal/eusart1/eusart1.h"
+/******SERIAL1*********/
+#ifdef _CORE16F_HAL_SERIAL1_ENABLE
+#include "hal/serial1/serial1.h"
 #endif
 
-/******EUSART1 TX ISR*********/
-#ifdef _CORE16F_HAL_EUSART1_ISR_ENABLE
-#include "hal/eusart1/eusart1_isr.h"
+/******SERIAL1 TX ISR*********/
+#ifdef _CORE16F_HAL_SERIAL1_ISR_ENABLE
+#include "hal/serial1/serial1_isr.h"
 #endif
 
 
@@ -265,6 +263,29 @@
 #ifdef _CORE16F_HAL_ONE_WIRE_ENABLE
 #include "hal/one_wire/one_wire.h"
 #endif
+
+
+
+
+
+
+
+
+/******************************************************************************
+***** CORE System Interface
+*******************************************************************************/
+typedef struct {
+  void (*Initialize)(void);  
+#ifdef _CORE16F_SYSTEM_INCLUDE_DELAYS_ENABLE
+  void (*Delay_MS)(uint32_t timeMS);   
+#endif
+}CORE16F_System_Interface_t;
+
+extern const CORE16F_System_Interface_t CORE;
+
+
+
+
 
 /******************************************************************************
 ********* Function Prototypes

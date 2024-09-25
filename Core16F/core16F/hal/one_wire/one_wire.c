@@ -3,7 +3,7 @@
 * Filename              :   one_wire.c
 * Author                :   Jamie Starling
 * Origin Date           :   2024/08/20
-* Version               :   1.0.0
+* Version               :   1.0.1
 * Compiler              :   XC8 
 * Target                :   Microchip PIC16F series 
 * Copyright             :   Jamie Starling
@@ -48,6 +48,16 @@
 *******************************************************************************/
 #include "one_wire.h"
 
+/******************************************************************************
+***** ONE WIRE Interface
+*******************************************************************************/
+const One_Wire_Interface_t ONE_WIRE = {
+  .Initialize = &ONE_WIRE_Init,
+  .Reset = &ONE_WIRE_Reset,
+  .WriteByte =  &ONE_WIRE_Write_Byte,  
+  .ReadByte =  &ONE_WIRE_Read_Byte,
+  .ReadBit = &ONE_WIRE_Read_Bit
+};
 
 /******************************************************************************
 * Function Prototypes

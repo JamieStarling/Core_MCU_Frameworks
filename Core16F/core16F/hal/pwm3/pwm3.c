@@ -3,7 +3,7 @@
 * Filename              :   pwm3.c
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/25
-* Version               :   1.0.0
+* Version               :   1.0.1
 * Compiler              :   XC8
 * Target                :   Microchip PIC16F series 
 * Copyright             :   © 2024 Jamie Starling
@@ -50,6 +50,14 @@
 #include "../pps/pps.h"
 #include "../tmr2/tmr2.h"
 
+/******************************************************************************
+***** PWM Interface
+*******************************************************************************/
+const PWM3_Interface_t PWM3 = {
+  .Initialize = &PWM3_Init,
+  .Output = &PWM3_Output_Enable,
+  .DutyCycle = &PWM3_Set_DutyCycle  
+};
 
 /******************************************************************************
 * Functions

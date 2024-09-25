@@ -3,7 +3,7 @@
 * Filename              :   pps.h
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/25
-* Version               :   1.0.0
+* Version               :   1.0.1
 * Compiler              :   XC8
 * Target                :   Microchip PIC16F series
 * Copyright             :   © 2024 Jamie Starling
@@ -53,6 +53,18 @@
 * Includes
 *******************************************************************************/
 #include "../../core16F.h"
+
+
+/******************************************************************************
+***** PPS Interface
+*******************************************************************************/
+typedef struct {
+  void (*MapOutput)(GPIO_Ports_t PortPin, PPSOutputPeripheralEnum_t PPS_Device);   
+  void (*MapBiDirection)(GPIO_Ports_t PortPin, PPSOutputPeripheralEnum_t PPS_Device, volatile uint8_t *regPPC_Input_ptr);
+  void (*MapInput)(GPIO_Ports_t PortPin, volatile uint8_t *regPPC_Input_ptr);
+}PPS_Interface_t;
+
+extern const PPS_Interface_t PPS;
 
 
 /******************************************************************************

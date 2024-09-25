@@ -3,7 +3,7 @@
 * Filename              :   tmr0.c
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/30
-* Version               :   1.0.0
+* Version               :   1.0.1
 * Compiler              :   XC8 
 * Target                :   Microchip PIC16F series 
 * Copyright             :   © 2024 Jamie Starling
@@ -48,6 +48,23 @@
 *******************************************************************************/
 #include "tmr0.h"
 
+
+/******************************************************************************
+* TMR0 Interface
+*******************************************************************************/
+const TMR0_Interface_t TIMER0 = {
+  .Enable = &TMR0_Enable,
+  .Set_16bitMode = &TMR0_Set_16bit_Mode,
+  .Set_OutputPostscaler = &TMR0_Set_Output_Postscaler,
+  .Set_ClockSource =  &TMR0_Set_Clock_Source,
+  .Set_InputAsyncMode =  &TMR0_Set_Input_Async_Mode,
+  .Set_PrescalerRate =  &TMR0_Set_Prescaler_Rate,
+  .Read_8bitValue =  &TMR0_Get_8bit_Value,
+  .Read_16bitValue =  &TMR0_Get_16bit_Value,
+  .Clear_InterruptFlag =  &TMR0_Clear_Interrupt_Flag,
+  .Set_InterruptEnable =  &TMR0_Enable_Interrupt,
+  .IsInterruptFlagSet =  &TMR0_Interrupt_Flag_Set
+};
 
 /******************************************************************************
 ***** Functions

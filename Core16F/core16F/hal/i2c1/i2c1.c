@@ -3,7 +3,7 @@
 * Filename              :   i2c.c
 * Author                :   Jamie Starling
 * Origin Date           :   2024/08/15
-* Version               :   1.0.0
+* Version               :   1.0.1
 * Compiler              :   XC8 
 * Target                :   Microchip PIC16F series 
 * Copyright             :   © 2024 Jamie Starling
@@ -50,6 +50,19 @@
 *******************************************************************************/
 #include "i2c1.h"
 
+/******************************************************************************
+* I2C1 Interface
+*******************************************************************************/
+const I2C1_Master_Interface_t I2C1_MASTER = {
+  .Initialize = &MASTER_I2C1_Init,
+  .WriteStart = &MASTER_I2C1_Send_Start_Bit_BLOCKING,
+  .WriteAddress =  &MASTER_I2C1_Send_Address_BLOCKING,  
+  .WriteStop =  &MASTER_I2C1_Send_Stop_BLOCKING,
+  .WriteByte =  &MASTER_I2C1_Send_Byte_BLOCKING,
+  .WriteBlock =  &MASTER_I2C1_Send_DataBlock_BLOCKING,
+  .ReadByte =  &MASTER_I2C1_Receive_Byte_BLOCKING,
+  .ReadBlock =  &MASTER_I2C1_Receive_DataBlock_BLOCKING
+};
 
 /******************************************************************************
 * Function Prototypes

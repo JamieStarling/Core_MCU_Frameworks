@@ -58,7 +58,7 @@
 
 void ISR_Global_Interrupt(LogicEnum_t setState);
 void ISR_Peripheral_Interrupt(LogicEnum_t setState);
-
+void ISR_Enable_System_Default(void);
 #endif /*_CORE16F_ISR_CORE_H*/
 
 /*** End of File **************************************************************/

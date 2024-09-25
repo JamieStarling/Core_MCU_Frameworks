@@ -4,7 +4,7 @@
 * Filename              :   eusart1.c
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/25
-* Version               :   1.0.0
+* Version               :   1.0.2
 * Compiler              :   XC8 
 * Target                :   Microchip PIC16F series
 * Copyright             :   © 2024 Jamie Starling
@@ -48,25 +48,39 @@
 /******************************************************************************
 ***** Includes
 *******************************************************************************/
-#include "eusart1.h"
+#include "serial1.h"
 #include "../pps/pps.h"
 #include <string.h>
+
+/******************************************************************************
+***** SERIAL1 Interface
+*******************************************************************************/
+const SERIAL1_Interface_t SERIAL1 = {
+    .Initialize = &SERIAL1_Init,
+    .WriteByte = &SERIAL1_WriteByte,
+    .WriteString = &SERIAL1_WriteString,
+    .IsDataAvailable = &SERIAL1_HasReceiveData,
+    .IsTransmitComplete = &SERIAL1_IsTSREmpty,
+    .ReadByte = &SERIAL1_GetReceivedData,
+    .IsTransmitBufferReady = &SERIAL1_IsTXBufferEmpty
+};
+
 
 /******************************************************************************
 ***** Functions
 *******************************************************************************/
 /******************************************************************************
-* Function : EUSART1_Init()
+* Function : SERIAL1_Init()
 *//** 
 * \b Description:
 *
-* Initializes the EUSART1 module with the selected baud rate configuration.
+* Initializes the SERIAL1 module with the selected baud rate configuration.
  * This function configures the baud rate, input/output pins, and enables the
  * transmitter and receiver based on the settings in the configuration array.
 *  
 * PRE-CONDITION:  None
 *
-* POST-CONDITION: The selected baud rate and settings are applied to EUSART1.
+* POST-CONDITION: The selected baud rate and settings are applied to SERIAL1.
 *
 * @param[in] SerialBaudEnum_t : From ESUART Lookup Table
 *
@@ -75,7 +89,7 @@
 * \b Example:
 * @code
 * 	
-* EUSART1_Init(BAUD_9600);  //Configures ESUART1 for 9600 Baud
+* SERIAL1_Init(BAUD_9600);  //Configures ESUART1 for 9600 Baud
 * 	
 * @endcode
 *
@@ -85,36 +99,36 @@
 *  
 * <hr>
 *******************************************************************************/
-void EUSART1_Init(SerialBaudEnum_t BaudSelect)
+void SERIAL1_Init(SerialBaudEnum_t BaudSelect)
 {  
  
-  SP1BRG = EUSART1_Config[BaudSelect].SP1BRG_Value;
-  BAUD1CONbits.BRG16 = EUSART1_Config[BaudSelect].BRG16_Enable;
-  TX1STAbits.SYNC = EUSART1_Config[BaudSelect].SYNC_Enable;
-  TX1STAbits.BRGH = EUSART1_Config[BaudSelect].BRGH_Enable;
+  SP1BRG = SERIAL1_Config[BaudSelect].SP1BRG_Value;
+  BAUD1CONbits.BRG16 = SERIAL1_Config[BaudSelect].BRG16_Enable;
+  TX1STAbits.SYNC = SERIAL1_Config[BaudSelect].SYNC_Enable;
+  TX1STAbits.BRGH = SERIAL1_Config[BaudSelect].BRGH_Enable;
   
-  GPIO_SetDirection(_CORE16F_EUSART1_INPUT_PIN,INPUT);  //Set as input -> Serial In
+  GPIO_SetDirection(_CORE16F_SERIAL1_INPUT_PIN,INPUT);  //Set as input -> Serial In
   
-  PPS_MapOutput(_CORE16F_EUSART1_OUTPUT_PIN,PPSOUT_TX1_CK1);  //Map TX to ->Serial Out
+  PPS_MapOutput(_CORE16F_SERIAL1_OUTPUT_PIN,PPSOUT_TX1_CK1);  //Map TX to ->Serial Out
     
-  RC1STAbits.CREN = EUSART1_Config[BaudSelect].CREN_Enable;
-  TX1STAbits.TXEN = EUSART1_Config[BaudSelect].TXEN_Enable;
-  RC1STAbits.SPEN = EUSART1_Config[BaudSelect].SPEN_Enable;     
+  RC1STAbits.CREN = SERIAL1_Config[BaudSelect].CREN_Enable;
+  TX1STAbits.TXEN = SERIAL1_Config[BaudSelect].TXEN_Enable;
+  RC1STAbits.SPEN = SERIAL1_Config[BaudSelect].SPEN_Enable;     
   
 }
 
 /******************************************************************************
-* Function : EUSART1_WriteByte()
+* Function : SERIAL1_WriteByte()
 *//** 
 * \b Description:
 *
-* Writes a byte of data to the EUSART1 transmit shift register (TSR).
+* Writes a byte of data to the SERIAL1 transmit shift register (TSR).
 * 
  * This function waits until the TSR buffer has space available and then writes
- * a byte of data for transmission over the EUSART1 serial port. It blocks execution
+ * a byte of data for transmission over the SERIAL1 serial port. It blocks execution
  * until the buffer is ready.
 *  
-* PRE-CONDITION:  EUSART1 module must be properly configured and initialized
+* PRE-CONDITION:  SERIAL1 module must be properly configured and initialized
 * 
 *
 * POST-CONDITION: The byte is written to the TSR buffer for transmission.
@@ -126,7 +140,7 @@ void EUSART1_Init(SerialBaudEnum_t BaudSelect)
 * \b Example:
 * @code
 * 	
-* EUSART1_WriteByte('A');  / Transmit character 'A'
+* SERIAL1_WriteByte('A');  / Transmit character 'A'
 * 	
 * @endcode
 *
@@ -135,22 +149,22 @@ void EUSART1_Init(SerialBaudEnum_t BaudSelect)
 * <br><b> - HISTORY OF CHANGES - </b>
 
 *******************************************************************************/
-void EUSART1_WriteByte(uint8_t SerialData)
+void SERIAL1_WriteByte(uint8_t SerialData)
 {
     while (!PIR3bits.TX1IF){}
     TX1REG = SerialData;     
 }
 
 /******************************************************************************
-* Function : EUSART1_WriteString()
+* Function : SERIAL1_WriteString()
 *//** 
 * \b Description:
 *
-* Writes a string of data to the EUSART1 transmit buffer (TSR).
+* Writes a string of data to the SERIAL1 transmit buffer (TSR).
 * This function will block if the buffer is full, waiting until the buffer
 * has space to accept new data. The function writes one byte at a time
 *  
-* PRE-CONDITION:  EUSART1 module must be properly configured and initialized
+* PRE-CONDITION:  SERIAL1 module must be properly configured and initialized
 * 
 *
 * POST-CONDITION: 
@@ -161,7 +175,7 @@ void EUSART1_WriteByte(uint8_t SerialData)
 *
 * \b Example:
 * @code
-* EUSART1_WriteString("Hello, world!");  // Send a string of data	
+* SERIAL1_WriteString("Hello, world!");  // Send a string of data	
 *
 * 	
 * @endcode
@@ -171,27 +185,27 @@ void EUSART1_WriteByte(uint8_t SerialData)
 * <br><b> - HISTORY OF CHANGES - </b>
 
 *******************************************************************************/
-void EUSART1_WriteString(char *StringData)
+void SERIAL1_WriteString(char *StringData)
 {
     uint8_t counter = 0;
     size_t length = strlen(StringData);
     
     // Loop through the string and transmit each character
     while (counter < length){        
-        EUSART1_WriteByte(StringData[counter]); // Send each byte individually
+        SERIAL1_WriteByte(StringData[counter]); // Send each byte individually
         counter++;       
     }
 }
 
 /******************************************************************************
-* Function : EUSART1_HasReceiveData()
+* Function : SERIAL1_HasReceiveData()
 *//** 
 * \b Description:
 *
 * Checks the state of ESUART FIFO Buffer for any received data.  
 * 
 * 
-* PRE-CONDITION: EUSART1 module must be properly configured and initialized 
+* PRE-CONDITION: SERIAL1 module must be properly configured and initialized 
 * 
 * POST-CONDITION: None
 *
@@ -202,7 +216,7 @@ void EUSART1_WriteString(char *StringData)
 * \b Example:
 * @code
 * 	
-* bool status = EUSART1_HasReceiveData(); //Checks the status for any received data
+* bool status = SERIAL1_HasReceiveData(); //Checks the status for any received data
 * 	
 * @endcode
 *
@@ -211,14 +225,14 @@ void EUSART1_WriteString(char *StringData)
 * <br><b> - HISTORY OF CHANGES - </b>
 
 *******************************************************************************/
-LogicEnum_t EUSART1_HasReceiveData(void)
+LogicEnum_t SERIAL1_HasReceiveData(void)
 {
     uint8_t RCBufferStatus = PIR3bits.RC1IF;    
     return RCBufferStatus;
 }
 
 /******************************************************************************
-* Function : EUSART1_IsTSREmpty()
+* Function : SERIAL1_IsTSREmpty()
 *//** 
 * \b Description:
 *
@@ -226,7 +240,7 @@ LogicEnum_t EUSART1_HasReceiveData(void)
 * 0 - TSR Full
 * 1 - TSR Empty
 * 
-* PRE-CONDITION:  EUSART1 module must be properly configured and initialized 
+* PRE-CONDITION:  SERIAL1 module must be properly configured and initialized 
 *
 * POST-CONDITION: None
 *
@@ -246,7 +260,7 @@ LogicEnum_t EUSART1_HasReceiveData(void)
 * <br><b> - HISTORY OF CHANGES - </b>
 
 *******************************************************************************/
-LogicEnum_t EUSART1_IsTSREmpty(void)
+LogicEnum_t SERIAL1_IsTSREmpty(void)
 {
     uint8_t TXStatus = TX1STAbits.TRMT;
     return TXStatus;
@@ -254,7 +268,7 @@ LogicEnum_t EUSART1_IsTSREmpty(void)
 /*** End of File **************************************************************/
 
 /******************************************************************************
-* Function : EUSART1_GetReceivedData()
+* Function : SERIAL1_GetReceivedData()
 *//** 
 * \b Description:
 *
@@ -281,13 +295,13 @@ LogicEnum_t EUSART1_IsTSREmpty(void)
 * <br><b> - HISTORY OF CHANGES - </b>
 
 *******************************************************************************/
-uint8_t EUSART1_GetReceivedData(void)
+uint8_t SERIAL1_GetReceivedData(void)
 {
     return RC1REG; 
 }
 
 /******************************************************************************
-* Function : EUSART1_IsTXBufferEmpty()
+* Function : SERIAL1_IsTXBufferEmpty()
 *//** 
 * \b Description:
 *
@@ -314,7 +328,7 @@ uint8_t EUSART1_GetReceivedData(void)
 * <br><b> - HISTORY OF CHANGES - </b>
 
 *******************************************************************************/
-LogicEnum_t EUSART1_IsTXBufferEmpty(void)
+LogicEnum_t SERIAL1_IsTXBufferEmpty(void)
 {
     uint8_t TXBuffer_Status = PIR3bits.TX1IF;    
     return TXBuffer_Status;

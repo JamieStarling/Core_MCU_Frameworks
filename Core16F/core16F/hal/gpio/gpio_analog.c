@@ -3,7 +3,7 @@
 * Filename              :   gpio_analog.c
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/25
-* Version               :   1.0.0
+* Version               :   1.0.1
 * Compiler              :   XC8
 * Target                :   Microchip PIC16F series 
 * Copyright             :   © 2024 Jamie Starling
@@ -48,6 +48,16 @@
 * Includes
 *******************************************************************************/
 #include "gpio_analog.h"
+
+/******************************************************************************
+***** Analog Interface
+*******************************************************************************/
+const GPIO_Analog_Interface_t GPIO_Analog = {
+  .Initialize = &GPIO_Analog_Init,
+  .SelectChannel = &GPIO_Analog_SelectChannel,
+  .PinSet = &GPIO_Analog_SetPortPin,
+  .ReadChannel =  &GPIO_Analog_ReadChannel
+};
 
 /******************************************************************************
 * Functions

@@ -3,7 +3,7 @@
 * Filename              :   core16_init.c
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/25
-* Version               :   1.0.0
+* Version               :   1.0.1
 * Compiler              :   XC8 
 * Target                :   Microchip PIC16F series 
 * Copyright             :   © 2024 Jamie Starling
@@ -47,6 +47,16 @@
 * Includes
 *******************************************************************************/
 #include "core16F.h"
+
+/******************************************************************************
+***** CORE System Interface
+*******************************************************************************/
+const CORE16F_System_Interface_t CORE = {
+    .Initialize = &CORE16F_init,
+    #ifdef _CORE16F_SYSTEM_INCLUDE_DELAYS_ENABLE
+    .Delay_MS = &CORE16F_Delay_BlockingMS
+    #endif /*_CORE16F_SYSTEM_INCLUDE_DELAYS_ENABLE*/
+};
 
 /******************************************************************************
 ****** Functions

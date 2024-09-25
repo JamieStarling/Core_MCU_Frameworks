@@ -50,6 +50,14 @@
 *******************************************************************************/
 #include "../core16F.h"
 
+
+
+/******************************************************************************
+* Configuration for ISR
+*******************************************************************************/
+#define _CORE16F_ENABLE_PERIPHERAL_INTERRUPT TRUE
+
+
 /******************************************************************************
 * Configuration for GPIO
 *******************************************************************************/
@@ -86,11 +94,11 @@ const GPIO_Config_t GPIO_Config[]=
 #endif //_CORE16F_HAL_GPIO_CONFIG_ENABLE
 
 /******************************************************************************
-***** Configuration for EUSART1
+***** Configuration for SERIAL1
 *******************************************************************************/
-#ifdef _CORE16F_HAL_EUSART1_ENABLE
-#define _CORE16F_EUSART1_INPUT_PIN PORTA_5      //Defines the EUSART Input Pin
-#define _CORE16F_EUSART1_OUTPUT_PIN PORTA_4     //Defines the EUSART Ouput Pin
+#ifdef _CORE16F_HAL_SERIAL1_ENABLE
+#define _CORE16F_SERIAL1_INPUT_PIN PORTA_5      //Defines the EUSART Input Pin
+#define _CORE16F_SERIAL1_OUTPUT_PIN PORTA_4     //Defines the EUSART Ouput Pin
 
 /******************************************************************************
  * \brief Baud Rate Selection Enum
@@ -103,9 +111,9 @@ typedef enum
 }SerialBaudEnum_t;
 
 /******************************************************************************
- * \brief EUSART1 Configuration Structure
+ * \brief SERIAL1 Configuration Structure
  * 
- * This structure defines the settings for the EUSART1 module, such as baud rate and control options.
+ * This structure defines the settings for the SERIAL1 module, such as baud rate and control options.
  ********************************************************************************/
 typedef struct
 {
@@ -116,21 +124,21 @@ typedef struct
     LogicEnum_t CREN_Enable;
     LogicEnum_t TXEN_Enable;
     LogicEnum_t SPEN_Enable;
-}EUSART1_Config_t;
+}SERIAL1_Config_t;
 
 /******************************************************************************
- * \brief EUSART1 Configuration Lookup Table
+ * \brief SERIAL1 Configuration Lookup Table
  * 
  ********************************************************************************/
 /*Config for 32Mhz*/
 #if _XTAL_FREQ == 32000000
-const EUSART1_Config_t EUSART1_Config[]=
+const SERIAL1_Config_t SERIAL1_Config[]=
 {        
     {832,ENABLED,DISABLED,ENABLED,ENABLED,ENABLED,ENABLED}  //9600Baud @32Mhz
 };
 #endif
 
-#endif //EUSART1 Config
+#endif //SERIAL1 Config
 
 
 

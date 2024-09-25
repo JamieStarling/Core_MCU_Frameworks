@@ -3,7 +3,7 @@
 * Filename              :   tmr2.h
 * Author                :   Jamie Starling
 * Origin Date           :   2024/09/09
-* Version               :   1.0.0
+* Version               :   1.0.1
 * Compiler              :   XC8 
 * Target                :   Microchip PIC16F series  
 * Copyright             :   © 2024 Jamie Starling
@@ -51,6 +51,21 @@
 *******************************************************************************/
 #include "../../core16F.h"
 
+/******************************************************************************
+***** TMR2 Interface
+*******************************************************************************/
+typedef struct {
+  void (*Enable)(LogicEnum_t setState);
+  void (*Set_OutputPostscaler)(TMR2_PostScaler_SelectEnum_t value);
+  void (*Set_ClockSource)(TMR2_Clock_Source_SelectEnum_t value);  
+  void (*Set_PrescalerRate)(TMR2_PreScaler_SelectEnum_t value);
+  uint8_t (*Read_8bitValue)(void);  
+  void (*Clear_InterruptFlag)(void);
+  void (*Set_InterruptEnable)(LogicEnum_t setState);
+  LogicEnum_t (*IsInterruptFlagSet)(void);
+}TMR2_Interface_t;
+
+extern const TMR2_Interface_t TIMER2;
 
 /******************************************************************************
 * Function Prototypes

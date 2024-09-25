@@ -3,7 +3,7 @@
 * Filename              :   pwm5.c
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/25
-* Version               :   1.0.0
+* Version               :   1.0.1
 * Compiler              :   XC8
 * Target                :   Microchip PIC16F series 
 * Copyright             :   © 2024 Jamie Starling
@@ -49,6 +49,15 @@
 #include "pwm5.h"
 #include "../pps/pps.h"
 #include "../tmr2/tmr2.h"
+
+/******************************************************************************
+***** PWM Interface
+*******************************************************************************/
+const PWM5_Interface_t PWM5 = {
+  .Initialize = &PWM5_Init,
+  .Output = &PWM5_Output_Enable,
+  .DutyCycle = &PWM5_Set_DutyCycle  
+};
 
 /******************************************************************************
 * Functions

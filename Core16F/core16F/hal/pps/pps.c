@@ -3,7 +3,7 @@
 * Filename              :   pps.c
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/25
-* Version               :   1.0.0
+* Version               :   1.0.1
 * Compiler              :   XC8 
 * Target                :   Microchip PIC16F series 
 * Copyright             :   © 2024 Jamie Starling
@@ -38,7 +38,7 @@
 /***************  CHANGE LIST *************************************************
 *
 *   Date        Version     Author          Description 
-*   2024/04/25  1.0.0       Jamie Starling  Initial Version
+*   2024/04/25  1.0.0      Jamie Starling  Initial Version
 *  
 *
 *****************************************************************************/
@@ -48,6 +48,16 @@
 *******************************************************************************/
 #include "pps.h"
 #include "../gpio/gpio.h"
+
+
+/******************************************************************************
+* PPS Interface
+*******************************************************************************/
+const PPS_Interface_t PPS = {
+  .MapOutput = &PPS_MapOutput,
+  .MapBiDirection = &PPS_MapBiDirection,
+  .MapInput = &PPS_MapInput
+};
 
 /******************************************************************************
 * Functions
@@ -160,7 +170,12 @@ void PPS_MapBiDirection(GPIO_Ports_t PortPin, PPSOutputPeripheralEnum_t PPS_Devi
    regPPC_ptr = (uint8_t*) PPS_OutputRegister_LU[PortPin];    
    
    *regPPC_ptr = PPS_Device;
-   *regPPC_Input_ptr = PPS_InputPin_LU[PortPin];
+   
+   // Check if regPPC_Input_ptr is valid before dereferencing
+    if (regPPC_Input_ptr != NULL)
+    {
+        *regPPC_Input_ptr = PPS_InputPin_LU[PortPin];
+    }
 }
 
 /******************************************************************************
@@ -205,7 +220,11 @@ void PPS_MapBiDirection(GPIO_Ports_t PortPin, PPSOutputPeripheralEnum_t PPS_Devi
 *******************************************************************************/
 void PPS_MapInput(GPIO_Ports_t PortPin, volatile uint8_t *regPPC_Input_ptr)
 {
-    *regPPC_Input_ptr = PPS_InputPin_LU[PortPin];
+  // Check if regPPC_Input_ptr is valid before dereferencing
+    if (regPPC_Input_ptr != NULL)
+    {
+        *regPPC_Input_ptr = PPS_InputPin_LU[PortPin];
+    }
 }
 
 

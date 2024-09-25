@@ -3,7 +3,7 @@
 * Filename              :   one_wire.h
 * Author                :   Jamie Starling
 * Origin Date           :   2024/08/20
-* Version               :   1.0.0
+* Version               :   1.0.1
 * Compiler              :   XC8
 * Target                :   Microchip PIC16F series
 * Copyright             :   Jamie Starling
@@ -73,6 +73,21 @@
 #define ONE_READ_BIT_DELAY_DRIVE_LOW_US 5
 #define ONE_READ_BIT_DELAY_DRIVE_HIGH_US 2
 #define ONE_READ_BIT_DELAY_END_US 45
+
+/******************************************************************************
+***** ONE WIRE Interface
+*******************************************************************************/
+typedef struct {
+  void (*Initialize)(void);
+  LogicEnum_t (*Reset)(void);
+  void (*WriteByte)(uint8_t data);
+  uint8_t (*ReadByte)(void);
+  uint8_t (*ReadBit)(void);
+}One_Wire_Interface_t;
+
+extern const One_Wire_Interface_t ONE_WIRE;
+
+
 /******************************************************************************
 * Function Prototypes
 *******************************************************************************/

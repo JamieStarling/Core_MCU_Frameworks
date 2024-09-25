@@ -52,6 +52,24 @@
 #include "../../core16F.h"
 
 /******************************************************************************
+***** TMR1 Interface
+*******************************************************************************/
+typedef struct {
+  void (*Enable)(LogicEnum_t setState);
+  void (*Set_16bitModeRW)(LogicEnum_t setState);
+  void (*Set_ClockSource)(TMR1_Clock_Source_SelectEnum_t value);  
+  void (*Set_PrescalerRate)(TMR1_PreScaler_SelectEnum_t value);
+  uint8_t (*Read_8bitValue)(void);
+  uint16_t (*Read_16bitValue)(void);
+  void (*Clear_InterruptFlag)(void);
+  void (*Set_InterruptEnable)(LogicEnum_t setState);
+  LogicEnum_t (*IsInterruptFlagSet)(void);
+}TMR1_Interface_t;
+
+extern const TMR1_Interface_t TIMER1;
+
+
+/******************************************************************************
 * Function Prototypes
 *******************************************************************************/
 void TMR1_Enable(LogicEnum_t setState);

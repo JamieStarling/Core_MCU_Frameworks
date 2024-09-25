@@ -1,5 +1,5 @@
 /****************************************************************************
-* Title                 :   EUSART1 ISR Handlers
+* Title                 :   SERIAL1 ISR Handlers
 * Filename              :   eusart1_isr.c
 * Author                :   Jamie Starling
 * Origin Date           :   2024/05/10
@@ -47,22 +47,23 @@
 /******************************************************************************
 * Includes
 *******************************************************************************/
-#include "eusart1_isr.h"
-#include "eusart1.h"
+#include "serial1_isr.h"
+#include "serial1.h"
+#include "../../isr/isr_control.h"
 
 /******************************************************************************
 ***** Functions
 *******************************************************************************/
 /******************************************************************************
-* Function : EUSART1_ISR_RC_Enable()
+* Function : SERIAL1_ISR_RC_Enable()
 *//** 
 * \b Description:
 *
-* Enables or disables the EUSART1 receive interrupt.
-* This function enables or disables the EUSART1 receive interrupt (RC1IE)
+* Enables or disables the SERIAL1 receive interrupt.
+* This function enables or disables the SERIAL1 receive interrupt (RC1IE)
 * depending on the `setState` parameter. 
 * 
-* PRE-CONDITION: EUSART1 module must be initialized.
+* PRE-CONDITION: SERIAL1 module must be initialized.
 * 
 *
 * POST-CONDITION: Interrupt for ESUART Receive is enabled or disabled
@@ -74,8 +75,8 @@
 * \b Example:
 * @code
 * 	
-* EUSART1_ISR_RC_Enable(ENABLED);  //Enable ISR for ESUART1 Receive
-* EUSART1_ISR_RC_Enable(DISABLED);  //Disable ISR for ESUART1 Receive
+* SERIAL1_ISR_RC_Enable(ENABLED);  //Enable ISR for ESUART1 Receive
+* SERIAL1_ISR_RC_Enable(DISABLED);  //Disable ISR for ESUART1 Receive
 * 	
 * @endcode
 *
@@ -85,13 +86,12 @@
 *  
 * <hr>
 *******************************************************************************/
-void EUSART1_ISR_RC_Enable(LogicEnum_t setState)
+void SERIAL1_ISR_RC_Enable(LogicEnum_t setState)
 {
   if(setState) //If ENABLED enable ISR for ESUART1 Receive
     {
-        INTCONbits.PEIE = 1;
-        INTCONbits.GIE = 1;
-        PIE3bits.RC1IE = 1;
+      PIE3bits.RC1IE = 1;  
+      ISR_Enable_System_Default();        
     }
   else //Other wise Disable ISR for ESUART1 Receive
     {
@@ -102,14 +102,14 @@ void EUSART1_ISR_RC_Enable(LogicEnum_t setState)
 
 
 /******************************************************************************
-* Function : EUSART1_ISR_Handler_RC()
+* Function : SERIAL1_ISR_Handler_RC()
 *//** 
 * \b Description:
-* EUSART1 receive interrupt handler.
- * This function handles the EUSART1 receive interrupt by calling a user-defined
+* SERIAL1 receive interrupt handler.
+ * This function handles the SERIAL1 receive interrupt by calling a user-defined
  * callback function (RCIRQ_HANDLER) with the received byte as a parameter. 
 *  
-* PRE-CONDITION:  EUSART1 module must be initialized.
+* PRE-CONDITION:  SERIAL1 module must be initialized.
 *
 * POST-CONDITION: The callback function processes the received data.
 *
@@ -130,21 +130,21 @@ void EUSART1_ISR_RC_Enable(LogicEnum_t setState)
 *  
 * <hr>
 *******************************************************************************/
-void EUSART1_ISR_Handler_RC(void (*RCIRQ_HANDLER)(uint8_t))
+void SERIAL1_ISR_Handler_RC(void (*RCIRQ_HANDLER)(uint8_t))
 {
     if (PIR3bits.RC1IF) //RC1IF is cleared when receive buffer is empty
     {
-        RCIRQ_HANDLER(EUSART1_GetReceivedData());
+        RCIRQ_HANDLER(SERIAL1_GetReceivedData());
     }
 }
 
 /******************************************************************************
-* Function : EUSART1_ISR_TX_Enable()
+* Function : SERIAL1_ISR_TX_Enable()
 *//** 
 * \b Description:
 *
-* Enables or disables the EUSART1 transmit interrupt.
-* This function enables or disables the EUSART1 transmit interrupt (TXIE)
+* Enables or disables the SERIAL1 transmit interrupt.
+* This function enables or disables the SERIAL1 transmit interrupt (TXIE)
 * based on the value of `setState`. 
 * 
 * The TXxIF interrupt can be enabled by setting the TXxIE interrupt enable bit
@@ -154,7 +154,7 @@ void EUSART1_ISR_Handler_RC(void (*RCIRQ_HANDLER)(uint8_t))
 * is more data to send. Clear the TXxIE interrupt enable bit upon writing the
 * last character of the transmission to the TXxREG.
 *  
-* PRE-CONDITION:  EUSART1 module must be initialized.
+* PRE-CONDITION:  SERIAL1 module must be initialized.
 * 
 *
 * POST-CONDITION: ESUART1 TX1IF - will generate an Interrupt
@@ -165,8 +165,8 @@ void EUSART1_ISR_Handler_RC(void (*RCIRQ_HANDLER)(uint8_t))
 *
 * \b Example:
 * @code
-* EUSART1_ISR_TX_Enable(ENABLED);  //Enable TXIF on ESUART1
-* EUSART1_ISR_TX_Enable(DISABLED);  //Disable TXIF on ESUART1
+* SERIAL1_ISR_TX_Enable(ENABLED);  //Enable TXIF on ESUART1
+* SERIAL1_ISR_TX_Enable(DISABLED);  //Disable TXIF on ESUART1
 * 	
 * @endcode
 *
@@ -176,13 +176,12 @@ void EUSART1_ISR_Handler_RC(void (*RCIRQ_HANDLER)(uint8_t))
 *  
 * <hr>
 *******************************************************************************/
-void EUSART1_ISR_TX_Enable(LogicEnum_t setState)
+void SERIAL1_ISR_TX_Enable(LogicEnum_t setState)
 {
   if(setState) //If ENABLED - Enable TX ISR
     {
-        INTCONbits.PEIE = 1;
-        INTCONbits.GIE = 1;
         PIE3bits.TX1IE = 1; 
+        ISR_Enable_System_Default();
     }
   else  //Otherwise Disable ESUART1 TX ISR
     {
@@ -192,16 +191,16 @@ void EUSART1_ISR_TX_Enable(LogicEnum_t setState)
 }
 
 /******************************************************************************
-* Function : EUSART1_ISR_Handler_TX()
+* Function : SERIAL1_ISR_Handler_TX()
 *//** 
-* \b Description: EUSART1 transmit interrupt handler.
+* \b Description: SERIAL1 transmit interrupt handler.
 *
 * The goes into the ISR function and processes the ISR for TX IRQ 
 *  
-* This function handles the EUSART1 transmit interrupt by calling a user-defined
+* This function handles the SERIAL1 transmit interrupt by calling a user-defined
 * callback function (TXIRQ_HANDLER) whenever the transmit interrupt is triggered.
 * 
-* PRE-CONDITION:  EUSART1 module must be initialized.
+* PRE-CONDITION:  SERIAL1 module must be initialized.
 *
 * POST-CONDITION: 
 *
@@ -222,7 +221,7 @@ void EUSART1_ISR_TX_Enable(LogicEnum_t setState)
 *  
 * <hr>
 *******************************************************************************/
-void EUSART1_ISR_Handler_TX(void (*TXIRQ_HANDLER)(void))
+void SERIAL1_ISR_Handler_TX(void (*TXIRQ_HANDLER)(void))
 {
     if (PIR3bits.TX1IF) //ISR is readonly - Set when Transmit buffer is empty.
     {

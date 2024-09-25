@@ -3,7 +3,7 @@
 * Filename              :   tmr0.h
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/30
-* Version               :   1.0.0
+* Version               :   1.0.1
 * Compiler              :   XC8
 * Target                :   Microchip PIC16F series
 * Copyright             :   © 2024 Jamie Starling
@@ -48,6 +48,26 @@
 * Includes
 *******************************************************************************/
 #include "../../core16F.h"
+
+/******************************************************************************
+***** TMR0 Interface
+*******************************************************************************/
+typedef struct {
+  void (*Enable)(LogicEnum_t setState);
+  void (*Set_16bitMode)(LogicEnum_t setState);
+  void (*Set_OutputPostscaler)(TMR0_PostScaler_SelectEnum_t value);
+  void (*Set_ClockSource)(TMR0_Clock_Source_SelectEnum_t value);
+  void (*Set_InputAsyncMode)(LogicEnum_t setState);
+  void (*Set_PrescalerRate)(TMR0_PreScaler_SelectEnum_t value);
+  uint8_t (*Read_8bitValue)(void);
+  uint16_t (*Read_16bitValue)(void);
+  void (*Clear_InterruptFlag)(void);
+  void (*Set_InterruptEnable)(LogicEnum_t setState);
+  LogicEnum_t (*IsInterruptFlagSet)(void);
+}TMR0_Interface_t;
+
+extern const TMR0_Interface_t TIMER0;
+
 
 /******************************************************************************
 * Function Prototypes

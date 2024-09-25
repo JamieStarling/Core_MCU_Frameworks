@@ -3,7 +3,7 @@
 * Filename              :   pwm6.c
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/25
-* Version               :   1.0.0
+* Version               :   1.0.1
 * Compiler              :   XC8
 * Target                :   Microchip PIC16F series 
 * Copyright             :   © 2024 Jamie Starling
@@ -49,6 +49,16 @@
 #include "pwm6.h"
 #include "../pps/pps.h"
 #include "../tmr2/tmr2.h"
+
+/******************************************************************************
+***** PWM Interface
+*******************************************************************************/
+const PWM6_Interface_t PWM6 = {
+  .Initialize = &PWM6_Init,
+  .Output = &PWM6_Output_Enable,
+  .DutyCycle = &PWM6_Set_DutyCycle  
+};
+
 
 /******************************************************************************
 * Functions

@@ -1,9 +1,10 @@
 /****************************************************************************
-* Title                 :   EUSART1 ISR Receive Handlers
-* Filename              :   eusart1_isr.h
+* Title                 :   SERIAL1 Functions - Enhanced Universal Synchronous
+*                           Asynchronous Receiver Transmitter
+* Filename              :   eusart1.h
 * Author                :   Jamie Starling
-* Origin Date           :   2024/05/10
-* Version               :   1.0.0
+* Origin Date           :   2024/04/25
+* Version               :   1.0.2
 * Compiler              :   XC8
 * Target                :   Microchip PIC16F series
 * Copyright             :   © 2024 Jamie Starling
@@ -38,25 +39,46 @@
 /***************  CHANGE LIST *************************************************
 *
 *   Date        Version     Author          Description 
-*   2024/05/10  1.0.0       Jamie Starling  Initial Version
+*   2024/04/25  1.0.0       Jamie Starling  Initial Version
 *  
 *
 *****************************************************************************/
 
-#ifndef _CORE16F_EUSART1_ISR
-#define _CORE16F_EUSART1_ISR
+#ifndef _CORE16F_SERIAL1_H
+#define _CORE16F_SERIAL1_H
 /******************************************************************************
-* Includes
+***** Includes
 *******************************************************************************/
 #include "../../core16F.h"
 
 /******************************************************************************
+***** SERIAL1 Interface
+*******************************************************************************/
+typedef struct {
+  void (*Initialize)(SerialBaudEnum_t BaudSelect); 
+  void (*WriteByte)(uint8_t SerialData);
+  void (*WriteString)(char *StringData);
+  LogicEnum_t (*IsDataAvailable)(void);
+  LogicEnum_t (*IsTransmitComplete)(void);
+  uint8_t (*ReadByte)(void);
+  LogicEnum_t (*IsTransmitBufferReady)(void);  
+}SERIAL1_Interface_t;
+
+extern const SERIAL1_Interface_t SERIAL1;
+
+
+/******************************************************************************
 * Function Prototypes
 *******************************************************************************/
-void EUSART1_ISR_RC_Enable(LogicEnum_t setState);
-void EUSART1_ISR_Handler_RC(void (*RCIRQ_HANDLER)(uint8_t)); 
-void EUSART1_ISR_TX_Enable(LogicEnum_t setState);
-void EUSART1_ISR_Handler_TX(void (*TXIRQ_HANDLER)(void));
-#endif /*_CORE16F_EUSART1_ISR_RC*/
+
+void SERIAL1_Init(SerialBaudEnum_t BaudSelect);
+void SERIAL1_WriteByte(uint8_t SerialData);
+void SERIAL1_WriteString(char *StringData);
+LogicEnum_t SERIAL1_HasReceiveData(void);
+LogicEnum_t SERIAL1_IsTSREmpty(void);
+uint8_t SERIAL1_GetReceivedData(void);
+LogicEnum_t SERIAL1_IsTXBufferEmpty(void);
+
+#endif /*_CORE16F_SERIAL1_H*/
 
 /*** End of File **************************************************************/
