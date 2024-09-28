@@ -3,7 +3,7 @@
 * Filename              :   gpio_analog.c
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/25
-* Version               :   1.0.1
+* Version               :   1.0.3
 * Compiler              :   XC8
 * Target                :   Microchip PIC16F series 
 * Copyright             :   © 2024 Jamie Starling
@@ -222,7 +222,7 @@ void GPIO_Analog_SelectChannel(AnalogChannelSelectEnum_t Channel)
 * the ADC for proper operation.
 *
 * PRE-CONDITION:  
-*    - The ADC module must be initialized with the proper conversion timing using `GPIO_Analog_Init()`.
+*    - None.
 *
 * POST-CONDITION: 
 *    - The GPIO pin is configured for analog input, and the selected analog channel 
@@ -253,20 +253,21 @@ void GPIO_Analog_SelectChannel(AnalogChannelSelectEnum_t Channel)
 void GPIO_Analog_SetPortPin(GPIO_Ports_t PortPin, AnalogChannelSelectEnum_t Channel)
 {
   //var that holds the registers of the Direction, Analog and PIN BitMask.
-   uint8_t *regDirection_ptr, *regAnalog_ptr, pinBitMask;
+   //uint8_t *regDirection_ptr, *regAnalog_ptr, pinBitMask;
    
    //Get the BitMask of the PIN    
-   pinBitMask = GPIO_PinBitMask_LU[PortPin];
+   //pinBitMask = GPIO_PinBitMask_LU[PortPin];
    
     //Get the register that controls the direction for the Pin
-   regDirection_ptr = (uint8_t*) GPIO_DirectionRegister_LU[PortPin];    
+   //regDirection_ptr = (uint8_t*) GPIO_DirectionRegister_LU[PortPin];    
    
    //Get the register that controls the analog for the Pin
-   regAnalog_ptr = (uint8_t*) GPIO_AnalogRegister_LU[PortPin];
+   //regAnalog_ptr = (uint8_t*) GPIO_AnalogRegister_LU[PortPin];
    
-   *regDirection_ptr &= ~pinBitMask; 
-   *regAnalog_ptr |= pinBitMask;
+   //*regDirection_ptr |= ~pinBitMask; 
+   //*regAnalog_ptr |= pinBitMask;
    
+   GPIO.ModeSet(PortPin,ANALOG);
    GPIO_Analog_Init(Channel);
 }
 

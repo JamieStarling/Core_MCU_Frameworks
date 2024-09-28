@@ -3,7 +3,7 @@
 * Filename              :   gpio.c
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/25
-* Version               :   1.0.1
+* Version               :   1.0.2
 * Compiler              :   XC8 
 * Target                :   Microchip PIC16F series 
 * Copyright             :   © 2024 Jamie Starling
@@ -152,7 +152,7 @@ void GPIO_SetDirection(GPIO_Ports_t PortPin, PinDirectionEnum_t PinDirection)
     //If Pin is to be set as analog input
     {
         //Invert the Mask - Clear the bit in the Direction Register and Set Analog Register
-        *regDirection_ptr &= ~pinBitMask;         
+        *regDirection_ptr |= ~pinBitMask;         
         *regAnalog_ptr |= pinBitMask; 
     }
    

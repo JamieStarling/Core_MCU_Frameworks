@@ -3,7 +3,7 @@
 * Filename              :   16F15313_LU.h
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/25
-* Version               :   1.0.0
+* Version               :   1.0.1
 * Compiler              :   XC8
 * Target                :   Microchip PIC16F15313
 * Copyright             :   © 2024 Jamie Starling
@@ -437,12 +437,12 @@ volatile unsigned char *const GPIO_AnalogRegister_LU[] =
  *******************************************************************************/
 typedef enum
 {
-    AN0 = 0b000000,			    
-    AN1 = 0b000001, 
-    AN2 = 0b000010,
-    AN3 = 0b000011,
-    AN4 = 0b000100,
-    AN5 = 0b000101,
+    ANA0 = 0b000000,			    
+    ANA1 = 0b000001, 
+    ANA2 = 0b000010,
+    ANA3 = 0b000011,
+    ANA4 = 0b000100,
+    ANA5 = 0b000101,
     AVSS = 0b111011,
     TEMPERATURE_SENSOR = 0b111100,
     DAC1_OUTPUT = 0b111101,

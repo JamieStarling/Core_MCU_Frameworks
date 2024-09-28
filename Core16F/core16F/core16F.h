@@ -133,14 +133,14 @@
 /******************************************************************************
 * Enable Core8 - GPIO Analog Functions
 *******************************************************************************/
-//#define _CORE16F_HAL_GPIO_ANALOG_ENABLE
+#define _CORE16F_HAL_GPIO_ANALOG_ENABLE
 
 /******************************************************************************
 * Enable Core8 - SERIAL1 Functions
 * Provides support for the Enhanced Universal Synchronous Asynchronous Receiver Transmitter (SERIAL1)
 * for serial communication.
 *******************************************************************************/
-//#define _CORE16F_HAL_SERIAL1_ENABLE
+#define _CORE16F_HAL_SERIAL1_ENABLE
 //#define _CORE16F_HAL_SERIAL1_ISR_ENABLE
 
 /******************************************************************************
