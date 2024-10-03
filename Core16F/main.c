@@ -33,7 +33,6 @@
 * Includes
 *******************************************************************************/
 #include "core16F/core16F.h"
-#include "core16F/hal/gpio/gpio_analog.h"  //Include Core8 Functions
 
 /******************************************************************************
 * Variables
@@ -48,21 +47,10 @@ void main(void)
   /*Initialize for the Core8 System   */
   CORE.Initialize(); //
   
-  /*Set PORTA.0 to Analog and Maps ANA0 Channel - Initializes Analog*/
-  GPIO_Analog.PinSet(PORTA_0,ANA0); //
-  
-  /*Initializes Serial1 to 9600 Baud
-  *On the PIC16F15313 Receive is PORTC.5 : Transmit is on PORTC.4 */
-  SERIAL1.Initialize(BAUD_9600);  //Initializes Serial1 - On the PIC16F15313 Receive is RC4
-  
+   
   while(1) //Program loop
     {      
-      uint16_t LDR_Value;
-      char SerialTransmit_Buffer[25];
-      LDR_Value = GPIO_Analog.ReadChannel();
-      sprintf(SerialTransmit_Buffer, "LDR Data : %d\n", LDR_Value);
-      SERIAL1.WriteString(SerialTransmit_Buffer);      
-      CORE.Delay_MS(1000);    
+ 
     }
 }
 

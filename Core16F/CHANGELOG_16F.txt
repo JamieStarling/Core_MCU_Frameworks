@@ -25,3 +25,6 @@ Date        Version     Author          Description
 2024/09/27  1.0.2       Jamie Starling  {FIX}Corrected Analog Input for GPIO_Analog_SetPortPin() gpio_analog.c
 2024/09/27  1.0.2       Jamie Starling  {FIX}Corrected Analog Input for GPIO_SetDirection() gpio.c
 2024/09/27  1.0.3       Jamie Starling  {UPDATE}gpio_analog.c GPIO_Analog_SetPortPin() to use PIO_SetDirection()
+2024/10/02  1.0.1       Jamie Starling  {UPDATE}Moved HAL Enable/Disable Directives to the device config header files.
+2024/10/03  1.0.2       Jamie Starling  {FIX}Corrected delay.c to check input value if less than min delay - set delay to min value.
+2024/10/03  1.0.3       Jamie Starling  {FIX}Corrected Analog Input for GPIO_SetDirection() gpio.c

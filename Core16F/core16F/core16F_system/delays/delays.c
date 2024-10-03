@@ -3,7 +3,7 @@
 * Filename              :   delays.c
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/25
-* Version               :   1.0.1
+* Version               :   1.0.2
 * Compiler              :   XC8 
 * Target                :   Microchip PIC16F series  
 * Copyright             :   © 2024 Jamie Starling
@@ -82,11 +82,14 @@
 * 
 *
 * <br><b> - HISTORY OF CHANGES - </b>
-*  
+*  1.0.2 Updated function to check for input value if less than Min Delay - Set to min delay value
 * <hr>
 *******************************************************************************/
 void CORE16F_Delay_BlockingMS(uint32_t timeMS)
 {
+  
+  if (timeMS < _CORE16F_MIN_DELAY_VALUE){timeMS = _CORE16F_MIN_DELAY_VALUE;}
+  
   // Store the current time in milliseconds  
   uint32_t startMS = ISR_CORE16F_SYSTEM_TIMER_GetMillis();
     

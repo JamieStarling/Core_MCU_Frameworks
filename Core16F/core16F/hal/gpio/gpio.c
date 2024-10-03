@@ -1,9 +1,9 @@
 /****************************************************************************
-* Title                 :   Core8 GPIO Digital Functions
+* Title                 :   Core MCU GPIO Digital Functions
 * Filename              :   gpio.c
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/25
-* Version               :   1.0.2
+* Version               :   1.0.3
 * Compiler              :   XC8 
 * Target                :   Microchip PIC16F series 
 * Copyright             :   © 2024 Jamie Starling
@@ -102,7 +102,7 @@ void GPIO_EnableWPUA (GPIO_Ports_t PortPin);
 * 
 *
 * <br><b> - HISTORY OF CHANGES - </b>
-
+1.0.3 Corrected ANALOG Direction Set
 *******************************************************************************/
 void GPIO_SetDirection(GPIO_Ports_t PortPin, PinDirectionEnum_t PinDirection)
 {  
@@ -151,8 +151,9 @@ void GPIO_SetDirection(GPIO_Ports_t PortPin, PinDirectionEnum_t PinDirection)
     else if (PinDirection == ANALOG)
     //If Pin is to be set as analog input
     {
-        //Invert the Mask - Clear the bit in the Direction Register and Set Analog Register
-        *regDirection_ptr |= ~pinBitMask;         
+        //Set the bit in the Direction Register with OR Along with Analog        
+              
+        *regDirection_ptr |= pinBitMask; 
         *regAnalog_ptr |= pinBitMask; 
     }
    
