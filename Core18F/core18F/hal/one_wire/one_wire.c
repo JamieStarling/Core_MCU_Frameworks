@@ -3,7 +3,7 @@
 * Filename              :   one_wire.c
 * Author                :   Jamie Starling
 * Origin Date           :   2024/08/20
-* Version               :   1.0.1
+* Version               :   1.0.0
 * Compiler              :   XC8 
 * Target                :   Microchip PIC16F series 
 * Copyright             :   Jamie Starling
@@ -48,16 +48,6 @@
 *******************************************************************************/
 #include "one_wire.h"
 
-/******************************************************************************
-***** ONE WIRE Interface
-*******************************************************************************/
-const One_Wire_Interface_t ONE_WIRE = {
-  .Initialize = &ONE_WIRE_Init,
-  .Reset = &ONE_WIRE_Reset,
-  .WriteByte =  &ONE_WIRE_Write_Byte,  
-  .ReadByte =  &ONE_WIRE_Read_Byte,
-  .ReadBit = &ONE_WIRE_Read_Bit
-};
 
 /******************************************************************************
 * Function Prototypes
@@ -182,8 +172,8 @@ LogicEnum_t ONE_WIRE_Reset(void)
 
   ONE_WIRE_Drive_High(); 
   
-  if (response == 0) {return DEVICE_PRESENT;}
-  return NO_DEVICE;  
+  if (response == 0) {return NO_DEVICE;}
+  return DEVICE_PRESENT;  
 }
 
 /******************************************************************************

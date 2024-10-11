@@ -1,11 +1,11 @@
 /****************************************************************************
-* Title                 :   Core8 Target Devices
-* Filename              :   core16_device.h
+* Title                 :   Core18F Target Devices
+* Filename              :   core18F_device.h
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/25
 * Version               :   1.0.0
 * Compiler              :   XC8
-* Target                :   Microchip PIC16F series
+* Target                :   Microchip PIC18F series 
 * Copyright             :   © 2024 Jamie Starling
 * All Rights Reserved
 *
@@ -44,29 +44,22 @@
 *
 *****************************************************************************/
 
-#ifndef _CORE16F_DEVICE_H
-#define _CORE16F_DEVICE_H
+#ifndef _CORE18F_DEVICE_H
+#define _CORE18F_DEVICE_H
 
 /******************************************************************************
 * Includes
 *******************************************************************************/
-#include "../core16F.h"
+#include "../core18F.h"
 
-// Include configuration bits and lookup table for PIC16F15313 device
-#ifdef _CORE16F_SYSTEM_DEVICE_16F15313
-#include "16F15313_configBits.h"
-#include "16F15313_core16F_config.h"
-#include "16F15313_LU.h"
-#endif
 
-// Include configuration bits and lookup table for PIC16F1532X series devices
-#ifdef _CORE16F_SYSTEM_DEVICE_16F1532X
-#include "16F1532x_configBits.h"
-#include "16F1532x_core16F_config.h"
-#include "16F1532x_LU.h"
+#ifdef _CORE18_SYSTEM_DEVICE_18F2xQ84
+#include "18F2xQ84_configBits.h"
+#include "18F2xQ84_core18F_config.h"
+#include "18F2xQ84_LU.h"
 #endif
 
 
 
-#endif /*_CORE16F_DEVICE_H*/
+#endif /*_CORE18F_DEVICE_H*/
 /*** End of File **************************************************************/

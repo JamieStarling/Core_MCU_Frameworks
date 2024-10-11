@@ -1,12 +1,12 @@
 /****************************************************************************
-* Title                 :   Config Settings for 16F15313
-* Filename              :   16F15313_config.h
+* Title                 :   Config Settings
+* Filename              :   18F2xQ84_config.h
 * Author                :   Jamie Starling
-* Origin Date           :   2024/04/25
-* Version               :   1.0.2
+* Origin Date           :   2024/08/25
+* Version               :   1.0.0
 * Compiler              :   XC8
-* Target                :   Microchip PIC16F15313
-* Copyright             :   © 2024 Jamie Starling
+* Target                :   PIC18F2xQ84
+* Copyright             :   Jamie Starling
 * All Rights Reserved
 *
 * THIS SOFTWARE IS PROVIDED BY JAMIE STARLING "AS IS" AND ANY EXPRESSED
@@ -35,121 +35,107 @@
  * 
 *****************************************************************************/
 
+
 /***************  CHANGE LIST *************************************************
 *
-*   Date        Version     Author          Description 
-*   2024/04/25  1.0.0       Jamie Starling  Initial Version
+*    Date    Version   Author         Description 
+*  
 *  
 *
 *****************************************************************************/
-
-#ifndef _CORE16F_16F15313_CONFIG_H
-#define _CORE16F_16F15313_CONFIG_H
+#ifndef _CORE18_18F2XQ84_CONFIG_H
+#define _CORE18_18F2XQ84_CONFIG_H
 /******************************************************************************
 * Includes
 *******************************************************************************/
-#include "../core16F.h"
+#include "../core18F.h"
 
 /******************************************************************************
 * Configuration for ISR
 *******************************************************************************/
-#define _CORE16F_ENABLE_PERIPHERAL_INTERRUPT TRUE
+#define _CORE18F_ISR_BASE_ADDRESS 0x000008
+#define _CORE18F_ENABLE_LOW_PRIORITY_INTERRUPTS TRUE
+#define _CORE18F_ENABLE_INTERRUPT_PRIORITY TRUE
+
 
 /******************************************************************************
-************* Configuration - Enable Disables MCU HAL and Features
-*******************************************************************************/
-
-/******************************************************************************
-*************Configuration - Core MCU Framework HAL Enable
+*************Configuration - Core8 HAL Enable
 *******************************************************************************/
 
 /******************************************************************************
 * Enable GPIO Config - GPIO_Init* 
 *******************************************************************************/
-//#define _CORE16F_HAL_GPIO_CONFIG_ENABLE
+//#define _CORE18F_HAL_GPIO_CONFIG_ENABLE
 
 /******************************************************************************
-* Enable HAL TMR0 Functions
+* Enable TMR0 Functions
 * System Timer Uses TMR0 - Don't need to enable if using the system timer
 *******************************************************************************/
-//#define _CORE16F_HAL_TMR0_ENABLE
+//#define _CORE18F_HAL_TMR0_ENABLE
 
 /******************************************************************************
-* Enable HAL TMR1 Functions
+* Enable TMR1 Functions
 *******************************************************************************/
-//#define _CORE16F_HAL_TMR1_ENABLE
+//#define _CORE18F_HAL_TMR1_ENABLE
 
 /******************************************************************************
-* Enable HAL TMR2 Functions
+* Enable TMR2 Functions
 * If using PWM TMR2 is automatically enabled. 
 *******************************************************************************/
-//#define _CORE16F_HAL_TMR2_ENABLE
+//#define _CORE18F_HAL_TMR2_ENABLE
 
 /******************************************************************************
-* Enable HAL - GPIO Analog Functions
+* Enable Core MCU - GPIO Analog Functions
 *******************************************************************************/
-#define _CORE16F_HAL_GPIO_ANALOG_ENABLE
+#define _CORE18F_HAL_GPIO_ANALOG_ENABLE
 
 /******************************************************************************
-* Enable Core8 - SERIAL1 Functions
+* Enable Core MCU - SERIAL1 Functions
 * Provides support for the Enhanced Universal Synchronous Asynchronous Receiver Transmitter (SERIAL1)
 * for serial communication.
 *******************************************************************************/
-#define _CORE16F_HAL_SERIAL1_ENABLE
-//#define _CORE16F_HAL_SERIAL1_ISR_ENABLE
+#define _CORE18F_HAL_SERIAL1_ENABLE
+//#define _CORE18F_HAL_SERIAL1_ISR_ENABLE
+
 
 /******************************************************************************
-* Enable HAL - PWM3 Functions
+* Enable Core8 - PWM3 Functions
 *******************************************************************************/
-#define _CORE16F_HAL_PWM3_ENABLE
+//#define _CORE18F_HAL_PWM3_ENABLE
 
 /******************************************************************************
-* Enable HAL - PWM4 Functions
+* Enable Core8 - PWM4 Functions
 *******************************************************************************/
-//#define _CORE16F_HAL_PWM4_ENABLE
+//#define _CORE18F_HAL_PWM4_ENABLE
 
 /******************************************************************************
-* Enable HAL - PWM5 Functions
+* Enable Core8 - PWM5 Functions
 *******************************************************************************/
-//#define _CORE16F_HAL_PWM5_ENABLE
+//#define _CORE18F_HAL_PWM5_ENABLE
 
 /******************************************************************************
-* Enable HAL - PWM6 Functions
+* Enable Core8 - PWM6 Functions
 *******************************************************************************/
-//#define _CORE16F_HAL_PWM6_ENABLE
+//#define _CORE18F_HAL_PWM6_ENABLE
 
 /******************************************************************************
-* Enable HAL - I2C Functions
+* Enable Core8 - I2C Functions
 *******************************************************************************/
-//#define _CORE16F_HAL_I2C_ENABLE
+//#define _CORE18F_HAL_I2C_ENABLE
 
 /******************************************************************************
-* Enable HAL - One Wire Functions
+* Enable Core8 - One Wire Functions
 *******************************************************************************/
-//#define _CORE16F_HAL_ONE_WIRE_ENABLE
+//#define _CORE18F_HAL_ONE_WIRE_ENABLE
 
-/******************************************************************************
-* Configuration for One Wire
-*******************************************************************************/
-/*PORTA.0*/
-#ifdef _CORE16F_HAL_ONE_WIRE_ENABLE
-#define OW_DIRECTION_REGISTER TRISAbits.TRISA0
-#define OW_PINDRIVER_REGISTER LATAbits.LATA0
-#define OW_PINREAD_REGISTER PORTAbits.RA0
-#define OW_PINANALOG_REGISTER ANSELAbits.ANSA0
-#endif
+
+
+
 
 /******************************************************************************
 * Configuration for GPIO
 *******************************************************************************/
-#ifdef _CORE16F_HAL_GPIO_CONFIG_ENABLE
-
-/******************************************************************************
- * \brief GPIO Configuration Structure
- * 
- * This structure holds the configuration for each GPIO pin, including its pin number,
- * input/output mode, and initial pin level.
- *******************************************************************************/
+#ifdef _CORE18F_HAL_GPIO_CONFIG_ENABLE
 typedef struct
 {
     GPIO_Ports_t PortPin; /** < The I/ O pin*/
@@ -158,11 +144,8 @@ typedef struct
 }GPIO_Config_t;
 
 
-/******************************************************************************
- * \brief GPIO Configuration Table
- * 
- * PortPin, Mode, Initial PinLevel
- *******************************************************************************/
+/*GPIO Configuration Table*/
+/*PortPin, Mode, Initial PinLevel*/
 const GPIO_Config_t GPIO_Config[]=
 {        
     {PORTA_0,OUTPUT,LOW},
@@ -172,19 +155,18 @@ const GPIO_Config_t GPIO_Config[]=
     {PORTA_4,OUTPUT,LOW},
     {PORTA_5,OUTPUT,LOW},
 };
-#endif //_CORE16F_HAL_GPIO_CONFIG_ENABLE
 
 /******************************************************************************
-***** Configuration for SERIAL1
+* Configuration for SERIAL1
 *******************************************************************************/
-#ifdef _CORE16F_HAL_SERIAL1_ENABLE
-#define _CORE16F_SERIAL1_INPUT_PIN PORTA_5      //Defines the EUSART Input Pin
-#define _CORE16F_SERIAL1_OUTPUT_PIN PORTA_4     //Defines the EUSART Ouput Pin
+#endif //_CORE18F_HAL_GPIO_CONFIG_ENABLE
 
-/******************************************************************************
- * \brief Baud Rate Selection Enum
- * 
- ********************************************************************************/
+#ifdef _CORE18F_HAL_SERIAL1_ENABLE
+
+#define _CORE18F_SERIAL1_INPUT_PIN PORTC_7
+#define _CORE18F_SERIAL1_OUTPUT_PIN PORTC_6
+//#define _CORE18F_SERIAL1_PPSOUT_REGISTER 
+
 typedef enum
 {
     BAUD_9600,
@@ -192,85 +174,55 @@ typedef enum
     BAUD_57600 
 }SerialBaudEnum_t;
 
-/******************************************************************************
- * \brief SERIAL1 Configuration Structure
- * 
- * This structure defines the settings for the SERIAL1 module, such as baud rate and control options.
- ********************************************************************************/
 typedef struct
 {
-    uint16_t SP1BRG_Value; 
-    LogicEnum_t BRG16_Enable; 
-    LogicEnum_t SYNC_Enable;
-    LogicEnum_t BRGH_Enable;
-    LogicEnum_t CREN_Enable;
-    LogicEnum_t TXEN_Enable;
-    LogicEnum_t SPEN_Enable;
+  uint8_t ESUART_Mode;  
+  uint16_t BRG_Value;         //Desired Baud Rate Value
+  LogicEnum_t BRGS_Enable;    //Desired Baud Rate Multiplier
+  LogicEnum_t RXEN_Enable;    //Receive Enable Control
+  LogicEnum_t TXEN_Enable;    //Transmit Enable Control
+  LogicEnum_t SPEN_Enable;    //Serial Port Enable
 }SERIAL1_Config_t;
 
-/******************************************************************************
- * \brief SERIAL1 Configuration Lookup Table
- * 
- ********************************************************************************/
-/*Config for 32Mhz*/
-#if _XTAL_FREQ == 32000000
+
+/*UART Config for 64Mhz*/
+#if _XTAL_FREQ == 64000000
 const SERIAL1_Config_t SERIAL1_Config[]=
 {        
-    {832,ENABLED,DISABLED,ENABLED,ENABLED,ENABLED,ENABLED},  //9600Baud @32Mhz
-    {416,ENABLED,DISABLED,ENABLED,ENABLED,ENABLED,ENABLED},  //19200 Baud @32Mhz
-    {34,DISABLED,DISABLED,ENABLED,ENABLED,ENABLED,ENABLED}  //57600 Baud @32Mhz
+    {0b0000,0x682,ENABLED,ENABLED,ENABLED,ENABLED},  //9600Baud @64Mhz
+    {0b0000,0x340,ENABLED,ENABLED,ENABLED,ENABLED},  //19200Baud @64Mhz
+    {0b0000,0x115,ENABLED,ENABLED,ENABLED,ENABLED}  //57600Baud @64Mhz
 };
-#endif
+#endif /*UART Config for 64Mhz*/
 
-#endif //SERIAL1 Config
-
-
+#endif //Main SERIAL1 Config
 
 /******************************************************************************
-***** Configuration for PWM
+* Configuration for PWM
 *******************************************************************************/
 
-/******************************************************************************
- * \brief PWM Enum 
- * 
- ******************************************************************************/
 typedef enum
 {
     PWM_8bit,
     PWM_10bit 
 }PWM_ConfigEnum_t;
 
-/******************************************************************************
- * \brief PWM Configuration Structure
- * 
-* This structure defines the settings for PWM, including the period register value and prescale setting.
- ******************************************************************************/
 typedef struct
 {
     uint8_t PR2_Value; 
     uint8_t T2_Prescale_Value; 
 }PWM_Config_t;
 
-/******************************************************************************
- * \brief PWM Configuration Table
- * 
-* This table defines the settings for PWM, including the period register value and prescale setting.
- ******************************************************************************/
-/*Config for 32Mhz*/
-#if _XTAL_FREQ == 32000000
+/*PWM Config for 64Mhz*/
+#if _XTAL_FREQ == 64000000
 const PWM_Config_t PWM_Config[]=
 {        
-    {65,0b00},  //32Mhz 8bit PWM
-    {255,0b00}   //32Mhz 10bit PWM
+    {65,0b00},  //64Mhz 8bit PWM
+    {255,0b00}   //64Mhz 10bit PWM
 };
-#endif
+#endif /*PWM Config for 64Mhz*/
 
-/******************************************************************************
-***** Configuration for I2C
-*******************************************************************************/
-#define I2C1_CLOCK_PIN PORTA_0
-#define I2C1_DATA_PIN PORTA_1
 
-#endif /*_CORE16F_16F1532X_CONFIG_H*/
+#endif /*_CORE18_18F2XQ84_CONFIG_H*/
 
 /*** End of File **************************************************************/

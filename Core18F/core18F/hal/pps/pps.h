@@ -1,14 +1,18 @@
 /****************************************************************************
-* Title                 :   One Wire HAL
-* Filename              :   one_wire.h
+* Title                 :   PPS Peripheral Pin Select functions
+* Filename              :   pps.h
 * Author                :   Jamie Starling
-* Origin Date           :   2024/08/20
-* Version               :   1.0.2
+* Origin Date           :   2024/04/25
+* Version               :   1.0.0
 * Compiler              :   XC8
-* Target                :   Microchip PIC16F series
-* Copyright             :   Jamie Starling
+* Target                :   Microchip PIC18F series
+* Copyright             :   © 2024 Jamie Starling
 * All Rights Reserved
 *
+* 
+* Purpose : Functions to for mapping The Peripheral Pin Select (PPS) module
+*  (PPS) module connects peripheral inputs and outputs to the device I/O pins
+* 
 * THIS SOFTWARE IS PROVIDED BY JAMIE STARLING "AS IS" AND ANY EXPRESSED
 * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
 * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -38,65 +42,37 @@
 /***************  CHANGE LIST *************************************************
 *
 *   Date        Version     Author          Description 
-*   2024/08/20  1.0.0       Jamie Starling  Initial Version
+*   2024/04/25  1.0.0       Jamie Starling  Initial Version
 *  
 *
 *****************************************************************************/
 
-#ifndef _CORE16F_ONE_WIRE_H
-#define _CORE16F_ONE_WIRE_H
+#ifndef _CORE18F_PPS_H
+#define _CORE18F_PPS_H
 /******************************************************************************
 * Includes
 *******************************************************************************/
-#include "../../core16F.h"
-
+#include "../../core18F.h"
 /******************************************************************************
-* Configuration
-*******************************************************************************/
-#define OW_DIRECTION_REGISTER TRISCbits.TRISC0
-#define OW_PINDRIVER_REGISTER LATCbits.LATC0
-#define OW_PINREAD_REGISTER PORTCbits.RC0
-#define OW_PINANALOG_REGISTER ANSELCbits.ANSC0
-
-/*ONE WIRE RESET TIMINGS*/
-#define ONE_WIRE_RESET_DELAY_US 485
-#define ONE_WIRE_RESET_DELAY_DRIVE_HIGH_US 70
-#define ONE_WIRE_RESET_DELAY_READ_US 410
-
-/*ONE WIRE WRITE TIMINGS*/
-#define ONE_WIRE_WRITE_BIT_1_DELAY_DRIVE_LOW_US 6
-#define ONE_WIRE_WRITE_BIT_1_DELAY_DRIVE_HIGH_US 64
-#define ONE_WIRE_WRITE_BIT_0_DELAY_DRIVE_LOW_US 60
-#define ONE_WIRE_WRITE_BIT_0_DELAY_DRIVE_HIGH_US 10
-
-/*ONE WIRE READ TIMINGS*/
-#define ONE_READ_BIT_DELAY_DRIVE_LOW_US 5
-#define ONE_READ_BIT_DELAY_DRIVE_HIGH_US 2
-#define ONE_READ_BIT_DELAY_END_US 45
-
-/******************************************************************************
-***** ONE WIRE Interface
+***** PPS Interface
 *******************************************************************************/
 typedef struct {
-  void (*Initialize)(void);
-  LogicEnum_t (*Reset)(void);
-  void (*WriteByte)(uint8_t data);
-  uint8_t (*ReadByte)(void);
-  uint8_t (*ReadBit)(void);
-}One_Wire_Interface_t;
+  void (*MapOutput)(GPIO_Ports_t PortPin, PPSOutputPeripheralEnum_t PPS_Device);   
+  void (*MapBiDirection)(GPIO_Ports_t PortPin, PPSOutputPeripheralEnum_t PPS_Device, volatile uint8_t *regPPC_Input_ptr);
+  void (*MapInput)(GPIO_Ports_t PortPin, volatile uint8_t *regPPC_Input_ptr);
+}PPS_Interface_t;
 
-extern const One_Wire_Interface_t ONE_WIRE;
+extern const PPS_Interface_t PPS;
 
 
 /******************************************************************************
 * Function Prototypes
 *******************************************************************************/
-void ONE_WIRE_Init(void);
-LogicEnum_t ONE_WIRE_Reset(void);
-void ONE_WIRE_Write_Byte(uint8_t data);
-uint8_t ONE_WIRE_Read_Byte(void);
-uint8_t ONE_WIRE_Read_Bit(void);
 
-#endif /*_CORE16F_ONE_WIRE_H*/
+void PPS_MapOutput(GPIO_Ports_t PortPin, PPSOutputPeripheralEnum_t PPS_Device);
+void PPS_MapBiDirection(GPIO_Ports_t PortPin, PPSOutputPeripheralEnum_t PPS_Device, volatile uint8_t *regPPC_Input_ptr);
+void PPS_MapInput(GPIO_Ports_t PortPin, volatile uint8_t *regPPC_Input_ptr);
+
+#endif /*_CORE18F_PPS_H*/
 
 /*** End of File **************************************************************/

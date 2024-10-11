@@ -1,5 +1,5 @@
 /****************************************************************************
-* Title                 :   Serial1 Functions - Enhanced Universal Synchronous
+* Title                 :   EUSART 1 Functions - Enhanced Universal Synchronous
 *                           Asynchronous Receiver Transmitter
 * Filename              :   eusart1.c
 * Author                :   Jamie Starling

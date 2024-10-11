@@ -1,12 +1,12 @@
 /****************************************************************************
 * Title                 :   Serial1 Functions - Enhanced Universal Synchronous
 *                           Asynchronous Receiver Transmitter
-* Filename              :   eusart1.c
+* Filename              :   serial1.c
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/25
-* Version               :   1.0.2
+* Version               :   1.0.0
 * Compiler              :   XC8 
-* Target                :   Microchip PIC16F series
+* Target                :   Microchip PIC18F series
 * Copyright             :   © 2024 Jamie Starling
 * All Rights Reserved
 *
@@ -53,18 +53,9 @@
 #include <string.h>
 
 /******************************************************************************
-***** SERIAL1 Interface
+* Function Prototypes
 *******************************************************************************/
-const SERIAL1_Interface_t SERIAL1 = {
-    .Initialize = &SERIAL1_Init,
-    .WriteByte = &SERIAL1_WriteByte,
-    .WriteString = &SERIAL1_WriteString,
-    .IsDataAvailable = &SERIAL1_HasReceiveData,
-    .IsTransmitComplete = &SERIAL1_IsTSREmpty,
-    .ReadByte = &SERIAL1_GetReceivedData,
-    .IsTransmitBufferReady = &SERIAL1_IsTXBufferEmpty
-};
-
+void SERIAL1_Wait_Until_TXBufferFree(void);
 
 /******************************************************************************
 ***** Functions
@@ -102,19 +93,18 @@ const SERIAL1_Interface_t SERIAL1 = {
 void SERIAL1_Init(SerialBaudEnum_t BaudSelect)
 {  
  
-  SP1BRG = SERIAL1_Config[BaudSelect].SP1BRG_Value;
-  BAUD1CONbits.BRG16 = SERIAL1_Config[BaudSelect].BRG16_Enable;
-  TX1STAbits.SYNC = SERIAL1_Config[BaudSelect].SYNC_Enable;
-  TX1STAbits.BRGH = SERIAL1_Config[BaudSelect].BRGH_Enable;
+  U1CON0bits.MODE = SERIAL1_Config[BaudSelect].ESUART_Mode; //Asynchronous 8-bit UART mode
+  U1BRG = SERIAL1_Config[BaudSelect].BRG_Value;
+   
+  U1CON0bits.BRGS = SERIAL1_Config[BaudSelect].BRGS_Enable;  
   
-  GPIO_SetDirection(_CORE16F_SERIAL1_INPUT_PIN,INPUT);  //Set as input -> Serial In
+  GPIO_SetDirection(_CORE18F_SERIAL1_INPUT_PIN,INPUT);  //Set as input -> Serial In
   
-  PPS_MapOutput(_CORE16F_SERIAL1_OUTPUT_PIN,PPSOUT_TX1_CK1);  //Map TX to ->Serial Out
-    
-  RC1STAbits.CREN = SERIAL1_Config[BaudSelect].CREN_Enable;
-  TX1STAbits.TXEN = SERIAL1_Config[BaudSelect].TXEN_Enable;
-  RC1STAbits.SPEN = SERIAL1_Config[BaudSelect].SPEN_Enable;     
+  PPS_MapOutput(_CORE18F_SERIAL1_OUTPUT_PIN,PPSOUT_UART1_TX);  //Map TX to ->Serial Out    
   
+  U1CON0bits.RXEN = SERIAL1_Config[BaudSelect].RXEN_Enable; //Receive Enable
+  U1CON0bits.TXEN = SERIAL1_Config[BaudSelect].TXEN_Enable; //Transmit Enable
+  U1CON1bits.ON = SERIAL1_Config[BaudSelect].SPEN_Enable; //Serial Port Enable
 }
 
 /******************************************************************************
@@ -151,8 +141,8 @@ void SERIAL1_Init(SerialBaudEnum_t BaudSelect)
 *******************************************************************************/
 void SERIAL1_WriteByte(uint8_t SerialData)
 {
-    while (!PIR3bits.TX1IF){}
-    TX1REG = SerialData;     
+    SERIAL1_Wait_Until_TXBufferFree();
+    U1TXB = SerialData;     
 }
 
 /******************************************************************************
@@ -227,8 +217,8 @@ void SERIAL1_WriteString(char *StringData)
 *******************************************************************************/
 LogicEnum_t SERIAL1_HasReceiveData(void)
 {
-    uint8_t RCBufferStatus = PIR3bits.RC1IF;    
-    return RCBufferStatus;
+    if(U1FIFObits.RXBE){return FALSE;}
+    return TRUE;
 }
 
 /******************************************************************************
@@ -262,10 +252,11 @@ LogicEnum_t SERIAL1_HasReceiveData(void)
 *******************************************************************************/
 LogicEnum_t SERIAL1_IsTSREmpty(void)
 {
-    uint8_t TXStatus = TX1STAbits.TRMT;
-    return TXStatus;
+    if (PIR4bits.U1TXIF){return TRUE;}
+    return FALSE; 
+    
 }
-/*** End of File **************************************************************/
+
 
 /******************************************************************************
 * Function : SERIAL1_GetReceivedData()
@@ -297,7 +288,7 @@ LogicEnum_t SERIAL1_IsTSREmpty(void)
 *******************************************************************************/
 uint8_t SERIAL1_GetReceivedData(void)
 {
-    return RC1REG; 
+    return U1RXB; 
 }
 
 /******************************************************************************
@@ -330,9 +321,43 @@ uint8_t SERIAL1_GetReceivedData(void)
 *******************************************************************************/
 LogicEnum_t SERIAL1_IsTXBufferEmpty(void)
 {
-    uint8_t TXBuffer_Status = PIR3bits.TX1IF;    
-    return TXBuffer_Status;
+    return (LogicEnum_t)(U1FIFObits.TXBE);    
+    
 }
+
+
+/******************************************************************************
+* Function :  SERIAL1_Wait_Until_TXBufferFree()
+*//** 
+* \b Description:
+*
+*  
+* PRE-CONDITION:  
+* PRE-CONDITION: 
+*
+* POST-CONDITION: 
+*
+* @param[in] 	
+*
+* @return 		
+*
+* \b Example:
+* @code
+* 	
+*
+* 	
+* @endcode
+*
+* 
+*
+* <br><b> - HISTORY OF CHANGES - </b>
+
+*******************************************************************************/
+void SERIAL1_Wait_Until_TXBufferFree(void)
+{
+  while (!SERIAL1_IsTXBufferEmpty()){} //Wait TX Buffer is free  
+}
+    
 
 
 /*** End of File **************************************************************/

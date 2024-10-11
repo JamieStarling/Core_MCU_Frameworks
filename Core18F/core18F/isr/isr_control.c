@@ -1,11 +1,11 @@
 /****************************************************************************
-* Title                 :   One Wire HAL
-* Filename              :   one_wire.h
+* Title                 :   Device ISR Control Functions
+* Filename              :   isr_control.c
 * Author                :   Jamie Starling
-* Origin Date           :   2024/08/20
-* Version               :   1.0.2
+* Origin Date           :   2024/04/25
+* Version               :   1.0.0
 * Compiler              :   XC8
-* Target                :   Microchip PIC16F series
+* Target                :    
 * Copyright             :   Jamie Starling
 * All Rights Reserved
 *
@@ -30,73 +30,84 @@
 *******************************************************************************/
 
 /*************** TODO *********************************************************
- * * 
+ * 
  * 
  * 
 *****************************************************************************/
 
-/***************  CHANGE LIST *************************************************
-*
-*   Date        Version     Author          Description 
-*   2024/08/20  1.0.0       Jamie Starling  Initial Version
-*  
-*
-*****************************************************************************/
 
-#ifndef _CORE16F_ONE_WIRE_H
-#define _CORE16F_ONE_WIRE_H
+/*************** CHANGE LOG ***************************************************
+*
+*    Date    Version   Author         Description 
+*
+*******************************************************************************/
+
 /******************************************************************************
 * Includes
 *******************************************************************************/
-#include "../../core16F.h"
-
-/******************************************************************************
-* Configuration
-*******************************************************************************/
-#define OW_DIRECTION_REGISTER TRISCbits.TRISC0
-#define OW_PINDRIVER_REGISTER LATCbits.LATC0
-#define OW_PINREAD_REGISTER PORTCbits.RC0
-#define OW_PINANALOG_REGISTER ANSELCbits.ANSC0
-
-/*ONE WIRE RESET TIMINGS*/
-#define ONE_WIRE_RESET_DELAY_US 485
-#define ONE_WIRE_RESET_DELAY_DRIVE_HIGH_US 70
-#define ONE_WIRE_RESET_DELAY_READ_US 410
-
-/*ONE WIRE WRITE TIMINGS*/
-#define ONE_WIRE_WRITE_BIT_1_DELAY_DRIVE_LOW_US 6
-#define ONE_WIRE_WRITE_BIT_1_DELAY_DRIVE_HIGH_US 64
-#define ONE_WIRE_WRITE_BIT_0_DELAY_DRIVE_LOW_US 60
-#define ONE_WIRE_WRITE_BIT_0_DELAY_DRIVE_HIGH_US 10
-
-/*ONE WIRE READ TIMINGS*/
-#define ONE_READ_BIT_DELAY_DRIVE_LOW_US 5
-#define ONE_READ_BIT_DELAY_DRIVE_HIGH_US 2
-#define ONE_READ_BIT_DELAY_END_US 45
-
-/******************************************************************************
-***** ONE WIRE Interface
-*******************************************************************************/
-typedef struct {
-  void (*Initialize)(void);
-  LogicEnum_t (*Reset)(void);
-  void (*WriteByte)(uint8_t data);
-  uint8_t (*ReadByte)(void);
-  uint8_t (*ReadBit)(void);
-}One_Wire_Interface_t;
-
-extern const One_Wire_Interface_t ONE_WIRE;
+#include "isr_control.h"
 
 
 /******************************************************************************
-* Function Prototypes
+* Functions
 *******************************************************************************/
-void ONE_WIRE_Init(void);
-LogicEnum_t ONE_WIRE_Reset(void);
-void ONE_WIRE_Write_Byte(uint8_t data);
-uint8_t ONE_WIRE_Read_Byte(void);
-uint8_t ONE_WIRE_Read_Bit(void);
+/******************************************************************************
+* Function : ISR_GIE_Disable
+*//** 
+* \b Description:
+*
+* Disables Global Interrupt
+*  
+* PRE-CONDITION:  
+* PRE-CONDITION: 
+*
+* POST-CONDITION: 
+*
+* @param[in] 	
+*
+* @return 		
+*
+* \b Example:
+* @code
+* 	
+*
+* 	
+* @endcode
+*
+* 
+*
+* <br><b> - HISTORY OF CHANGES - </b>
+*  
+* <hr>
+*******************************************************************************/
 
-#endif /*_CORE16F_ONE_WIRE_H*/
+void ISR_Global_Interrupt(LogicEnum_t setState)
+{
+  INTCON0bits.GIE = setState;
+}
+
+void ISR_Global_Low_Priority_Interrupt(LogicEnum_t setState)
+{
+  INTCON0bits.GIEL = setState;
+}
+
+void ISR_Interrupt_Priority_Enable(LogicEnum_t setState)
+{
+  INTCON0bits.IPEN = setState;  
+}
+
+ISR_Interrupt_StateEnum_t ISR_Interrupt_Status(void)
+{
+  return INTCON1 >> 6;  
+}
+        
+void ISR_Enable_System_Default(void)
+{
+  if(_CORE18F_ENABLE_LOW_PRIORITY_INTERRUPTS){ISR_Global_Low_Priority_Interrupt(ENABLED);}
+  if(_CORE18F_ENABLE_INTERRUPT_PRIORITY){ISR_Interrupt_Priority_Enable(ENABLED);}
+  ISR_Global_Interrupt(ENABLED);  
+}
+
+
 
 /*** End of File **************************************************************/

@@ -1,12 +1,12 @@
 /****************************************************************************
-* Title                 :   One Wire HAL
-* Filename              :   one_wire.h
+* Title                 :   Core8 System Delays
+* Filename              :   delays.c
 * Author                :   Jamie Starling
-* Origin Date           :   2024/08/20
+* Origin Date           :   2024/04/25
 * Version               :   1.0.2
-* Compiler              :   XC8
-* Target                :   Microchip PIC16F series
-* Copyright             :   Jamie Starling
+* Compiler              :   XC8 
+* Target                :   Microchip PIC16F series  
+* Copyright             :   © 2024 Jamie Starling
 * All Rights Reserved
 *
 * THIS SOFTWARE IS PROVIDED BY JAMIE STARLING "AS IS" AND ANY EXPRESSED
@@ -30,73 +30,71 @@
 *******************************************************************************/
 
 /*************** TODO *********************************************************
- * * 
+ * 
  * 
  * 
 *****************************************************************************/
+
 
 /***************  CHANGE LIST *************************************************
 *
 *   Date        Version     Author          Description 
-*   2024/08/20  1.0.0       Jamie Starling  Initial Version
+*   2024/04/25  1.0.0       Jamie Starling  Initial Version
 *  
 *
 *****************************************************************************/
 
-#ifndef _CORE16F_ONE_WIRE_H
-#define _CORE16F_ONE_WIRE_H
 /******************************************************************************
-* Includes
+***** Includes
 *******************************************************************************/
-#include "../../core16F.h"
-
-/******************************************************************************
-* Configuration
-*******************************************************************************/
-#define OW_DIRECTION_REGISTER TRISCbits.TRISC0
-#define OW_PINDRIVER_REGISTER LATCbits.LATC0
-#define OW_PINREAD_REGISTER PORTCbits.RC0
-#define OW_PINANALOG_REGISTER ANSELCbits.ANSC0
-
-/*ONE WIRE RESET TIMINGS*/
-#define ONE_WIRE_RESET_DELAY_US 485
-#define ONE_WIRE_RESET_DELAY_DRIVE_HIGH_US 70
-#define ONE_WIRE_RESET_DELAY_READ_US 410
-
-/*ONE WIRE WRITE TIMINGS*/
-#define ONE_WIRE_WRITE_BIT_1_DELAY_DRIVE_LOW_US 6
-#define ONE_WIRE_WRITE_BIT_1_DELAY_DRIVE_HIGH_US 64
-#define ONE_WIRE_WRITE_BIT_0_DELAY_DRIVE_LOW_US 60
-#define ONE_WIRE_WRITE_BIT_0_DELAY_DRIVE_HIGH_US 10
-
-/*ONE WIRE READ TIMINGS*/
-#define ONE_READ_BIT_DELAY_DRIVE_LOW_US 5
-#define ONE_READ_BIT_DELAY_DRIVE_HIGH_US 2
-#define ONE_READ_BIT_DELAY_END_US 45
-
-/******************************************************************************
-***** ONE WIRE Interface
-*******************************************************************************/
-typedef struct {
-  void (*Initialize)(void);
-  LogicEnum_t (*Reset)(void);
-  void (*WriteByte)(uint8_t data);
-  uint8_t (*ReadByte)(void);
-  uint8_t (*ReadBit)(void);
-}One_Wire_Interface_t;
-
-extern const One_Wire_Interface_t ONE_WIRE;
+#include "delays.h"
+#include "../timer/isr_core16F_system_timer.h"
 
 
 /******************************************************************************
-* Function Prototypes
+****** Functions
 *******************************************************************************/
-void ONE_WIRE_Init(void);
-LogicEnum_t ONE_WIRE_Reset(void);
-void ONE_WIRE_Write_Byte(uint8_t data);
-uint8_t ONE_WIRE_Read_Byte(void);
-uint8_t ONE_WIRE_Read_Bit(void);
-
-#endif /*_CORE16F_ONE_WIRE_H*/
+/******************************************************************************
+* Function : CORE16F_Delay_BlockingMS()
+*//** 
+* \b Description:
+*
+* Generates a blocking delay for a specified time in milliseconds.
+* This function blocks the program execution for the given number of milliseconds.
+* It is primarily used for implementing time delays in the Core8 system.
+*  
+* PRE-CONDITION: The system timer must be enabled and properly initialized. 
+* PRE-CONDITION: _CORE16F_SYSTEM_TIMER_ENABLE should be set in core16F.h
+*
+* POST-CONDITION: Program execution is delayed by the specified time.
+*
+* @param[in] : timeMS  The delay time in milliseconds. 	
+*
+* @return : void. This function does not return a value.		
+*
+* \b Example:
+* @code
+* 	
+* CORE16F_Delay_BlockingMS(1000);  //Performs a 1000Ms Delay or 1 second.
+* 	
+* @endcode
+*
+* 
+*
+* <br><b> - HISTORY OF CHANGES - </b>
+*  1.0.2 Updated function to check for input value if less than Min Delay - Set to min delay value
+* <hr>
+*******************************************************************************/
+void CORE16F_Delay_BlockingMS(uint32_t timeMS)
+{
+  
+  if (timeMS < _CORE16F_MIN_DELAY_VALUE){timeMS = _CORE16F_MIN_DELAY_VALUE;}
+  
+  // Store the current time in milliseconds  
+  uint32_t startMS = ISR_CORE16F_SYSTEM_TIMER_GetMillis();
+    
+  // Block execution until the specified time has passed 
+  while (ISR_CORE16F_SYSTEM_TIMER_GetMillis() - startMS < timeMS){}
+}
 
 /*** End of File **************************************************************/

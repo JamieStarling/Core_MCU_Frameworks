@@ -1,12 +1,12 @@
 /****************************************************************************
-* Title                 :   One Wire HAL
-* Filename              :   one_wire.h
+* Title                 :   PWM6 Functions
+* Filename              :   pwm6.h
 * Author                :   Jamie Starling
-* Origin Date           :   2024/08/20
-* Version               :   1.0.2
+* Origin Date           :   2024/04/25
+* Version               :   1.0.0
 * Compiler              :   XC8
 * Target                :   Microchip PIC16F series
-* Copyright             :   Jamie Starling
+* Copyright             :   © 2024 Jamie Starling
 * All Rights Reserved
 *
 * THIS SOFTWARE IS PROVIDED BY JAMIE STARLING "AS IS" AND ANY EXPRESSED
@@ -38,65 +38,26 @@
 /***************  CHANGE LIST *************************************************
 *
 *   Date        Version     Author          Description 
-*   2024/08/20  1.0.0       Jamie Starling  Initial Version
+*   2024/04/25  1.0.0       Jamie Starling  Initial Version
 *  
 *
 *****************************************************************************/
 
-#ifndef _CORE16F_ONE_WIRE_H
-#define _CORE16F_ONE_WIRE_H
+#ifndef _CORE18F_PWM6_H
+#define _CORE18F_PWM6_H
 /******************************************************************************
 * Includes
 *******************************************************************************/
-#include "../../core16F.h"
-
-/******************************************************************************
-* Configuration
-*******************************************************************************/
-#define OW_DIRECTION_REGISTER TRISCbits.TRISC0
-#define OW_PINDRIVER_REGISTER LATCbits.LATC0
-#define OW_PINREAD_REGISTER PORTCbits.RC0
-#define OW_PINANALOG_REGISTER ANSELCbits.ANSC0
-
-/*ONE WIRE RESET TIMINGS*/
-#define ONE_WIRE_RESET_DELAY_US 485
-#define ONE_WIRE_RESET_DELAY_DRIVE_HIGH_US 70
-#define ONE_WIRE_RESET_DELAY_READ_US 410
-
-/*ONE WIRE WRITE TIMINGS*/
-#define ONE_WIRE_WRITE_BIT_1_DELAY_DRIVE_LOW_US 6
-#define ONE_WIRE_WRITE_BIT_1_DELAY_DRIVE_HIGH_US 64
-#define ONE_WIRE_WRITE_BIT_0_DELAY_DRIVE_LOW_US 60
-#define ONE_WIRE_WRITE_BIT_0_DELAY_DRIVE_HIGH_US 10
-
-/*ONE WIRE READ TIMINGS*/
-#define ONE_READ_BIT_DELAY_DRIVE_LOW_US 5
-#define ONE_READ_BIT_DELAY_DRIVE_HIGH_US 2
-#define ONE_READ_BIT_DELAY_END_US 45
-
-/******************************************************************************
-***** ONE WIRE Interface
-*******************************************************************************/
-typedef struct {
-  void (*Initialize)(void);
-  LogicEnum_t (*Reset)(void);
-  void (*WriteByte)(uint8_t data);
-  uint8_t (*ReadByte)(void);
-  uint8_t (*ReadBit)(void);
-}One_Wire_Interface_t;
-
-extern const One_Wire_Interface_t ONE_WIRE;
+#include "../../core18F.h"
 
 
 /******************************************************************************
 * Function Prototypes
 *******************************************************************************/
-void ONE_WIRE_Init(void);
-LogicEnum_t ONE_WIRE_Reset(void);
-void ONE_WIRE_Write_Byte(uint8_t data);
-uint8_t ONE_WIRE_Read_Byte(void);
-uint8_t ONE_WIRE_Read_Bit(void);
+void PWM6_Init(GPIO_Ports_t PortPin,PWM_ConfigEnum_t PWM_Config);
+void PWM6_Output_Enable(LogicEnum_t setState);
+void PWM6_Set_DutyCycle(uint16_t dutyValue);
 
-#endif /*_CORE16F_ONE_WIRE_H*/
+#endif /*_CORE18F_PWM6_H*/
 
 /*** End of File **************************************************************/

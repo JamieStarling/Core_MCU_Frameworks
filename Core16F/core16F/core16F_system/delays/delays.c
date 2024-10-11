@@ -1,5 +1,5 @@
 /****************************************************************************
-* Title                 :   Core8 System Delays
+* Title                 :   Core16F System Delays
 * Filename              :   delays.c
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/25

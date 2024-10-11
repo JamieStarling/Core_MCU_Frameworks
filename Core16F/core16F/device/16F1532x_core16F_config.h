@@ -1,9 +1,9 @@
 /****************************************************************************
 * Title                 :   Config Settings for PIC16F15323/4/5
-* Filename              :   16F1532x_config.h
+* Filename              :   16F1532x_core16F_config.h
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/25
-* Version               :   1.0.1
+* Version               :   1.0.2
 * Compiler              :   XC8
 * Target                :   Microchip PIC16F15323/4/5
 * Copyright             :   © 2024 Jamie Starling
@@ -125,8 +125,18 @@
 /******************************************************************************
 * Enable HAL - One Wire Functions
 *******************************************************************************/
-//#define _CORE16F_HAL_ONE_WIRE_ENABLE
+#define _CORE16F_HAL_ONE_WIRE_ENABLE
 
+/******************************************************************************
+* Configuration for One Wire
+*******************************************************************************/
+/*PORTC.0*/
+#ifdef _CORE16F_HAL_ONE_WIRE_ENABLE
+#define OW_DIRECTION_REGISTER TRISCbits.TRISC0
+#define OW_PINDRIVER_REGISTER LATCbits.LATC0
+#define OW_PINREAD_REGISTER PORTCbits.RC0
+#define OW_PINANALOG_REGISTER ANSELCbits.ANSC0
+#endif
 
 /******************************************************************************
 * Configuration for GPIO
@@ -178,6 +188,7 @@ const GPIO_Config_t GPIO_Config[]=
 typedef enum
 {
     BAUD_9600,
+    BAUD_19200,
     BAUD_57600 
 }SerialBaudEnum_t;
 
@@ -205,7 +216,9 @@ typedef struct
 #if _XTAL_FREQ == 32000000
 const SERIAL1_Config_t SERIAL1_Config[]=
 {        
-    {832,ENABLED,DISABLED,ENABLED,ENABLED,ENABLED,ENABLED}  //9600Baud @32Mhz
+    {832,ENABLED,DISABLED,ENABLED,ENABLED,ENABLED,ENABLED},  //9600Baud @32Mhz
+    {416,ENABLED,DISABLED,ENABLED,ENABLED,ENABLED,ENABLED},  //19200 Baud @32Mhz
+    {34,DISABLED,DISABLED,ENABLED,ENABLED,ENABLED,ENABLED}  //57600 Baud @32Mhz
 };
 #endif
 

@@ -1,12 +1,12 @@
 /****************************************************************************
-* Title                 :   One Wire HAL
-* Filename              :   one_wire.h
+* Title                 :   I2C HAL Functions
+* Filename              :   i2c.h
 * Author                :   Jamie Starling
-* Origin Date           :   2024/08/20
-* Version               :   1.0.2
+* Origin Date           :   2024/08/15
+* Version               :   1.0.0
 * Compiler              :   XC8
 * Target                :   Microchip PIC16F series
-* Copyright             :   Jamie Starling
+* Copyright             :   © 2024 Jamie Starling
 * All Rights Reserved
 *
 * THIS SOFTWARE IS PROVIDED BY JAMIE STARLING "AS IS" AND ANY EXPRESSED
@@ -38,65 +38,68 @@
 /***************  CHANGE LIST *************************************************
 *
 *   Date        Version     Author          Description 
-*   2024/08/20  1.0.0       Jamie Starling  Initial Version
+*   2024/08/15  1.0.0       Jamie Starling  Initial Version
 *  
 *
 *****************************************************************************/
 
-#ifndef _CORE16F_ONE_WIRE_H
-#define _CORE16F_ONE_WIRE_H
+#ifndef _CORE18F_I2C_H
+#define _CORE18F_I2C_H
 /******************************************************************************
 * Includes
 *******************************************************************************/
-#include "../../core16F.h"
+#include "../../core18F.h"
 
 /******************************************************************************
-* Configuration
+****** Configuration
 *******************************************************************************/
-#define OW_DIRECTION_REGISTER TRISCbits.TRISC0
-#define OW_PINDRIVER_REGISTER LATCbits.LATC0
-#define OW_PINREAD_REGISTER PORTCbits.RC0
-#define OW_PINANALOG_REGISTER ANSELCbits.ANSC0
-
-/*ONE WIRE RESET TIMINGS*/
-#define ONE_WIRE_RESET_DELAY_US 485
-#define ONE_WIRE_RESET_DELAY_DRIVE_HIGH_US 70
-#define ONE_WIRE_RESET_DELAY_READ_US 410
-
-/*ONE WIRE WRITE TIMINGS*/
-#define ONE_WIRE_WRITE_BIT_1_DELAY_DRIVE_LOW_US 6
-#define ONE_WIRE_WRITE_BIT_1_DELAY_DRIVE_HIGH_US 64
-#define ONE_WIRE_WRITE_BIT_0_DELAY_DRIVE_LOW_US 60
-#define ONE_WIRE_WRITE_BIT_0_DELAY_DRIVE_HIGH_US 10
-
-/*ONE WIRE READ TIMINGS*/
-#define ONE_READ_BIT_DELAY_DRIVE_LOW_US 5
-#define ONE_READ_BIT_DELAY_DRIVE_HIGH_US 2
-#define ONE_READ_BIT_DELAY_END_US 45
 
 /******************************************************************************
-***** ONE WIRE Interface
-*******************************************************************************/
-typedef struct {
-  void (*Initialize)(void);
-  LogicEnum_t (*Reset)(void);
-  void (*WriteByte)(uint8_t data);
-  uint8_t (*ReadByte)(void);
-  uint8_t (*ReadBit)(void);
-}One_Wire_Interface_t;
+ * \brief I2C Return Codes
+ * 
+ ******************************************************************************/
+typedef enum
+{
+ I2C_OK,
+ I2C_ADDRESS_VALID_WRITE,
+ I2C_ADDRESS_VALID_READ,
+ I2C_ADDRESS_INVALID,
+ I2C_ACK_RECEIVED,
+ I2C_NO_ACK_RECEIVED,
+ I2C_TIMEOUT,
+}I2C_Status_Enum_t;
 
-extern const One_Wire_Interface_t ONE_WIRE;
+typedef enum
+{
+  I2C_SEND_START_BIT,
+  I2C_SEND_ADDRESS,
+  I2C_SEND_DATA,
+  I2C_READ_DATA,
+  I2C_SEND_STOP_BIT 
+}I2C_Send_State_Enum_t;
+
+typedef enum
+{
+  I2C_ADDRESS_WRITE_MODE = 0,
+  I2C_ADDRESS_READ_MODE = 1  
+}I2C_Address_Mode_Enum_t;
 
 
 /******************************************************************************
 * Function Prototypes
 *******************************************************************************/
-void ONE_WIRE_Init(void);
-LogicEnum_t ONE_WIRE_Reset(void);
-void ONE_WIRE_Write_Byte(uint8_t data);
-uint8_t ONE_WIRE_Read_Byte(void);
-uint8_t ONE_WIRE_Read_Bit(void);
+void MASTER_I2C1_Init(void);
+void MASTER_I2C1_Send_Start_Bit_BLOCKING(void);
+I2C_Status_Enum_t MASTER_I2C1_Send_Address_BLOCKING(uint8_t address, I2C_Address_Mode_Enum_t address_mode);
+void MASTER_I2C1_Send_Stop_BLOCKING(void);
+I2C_Status_Enum_t MASTER_I2C1_Send_Byte_BLOCKING(uint8_t data);
+I2C_Status_Enum_t MASTER_I2C1_Send_DataBlock_BLOCKING(uint8_t *datablock, uint8_t data_length);
+uint8_t MASTER_I2C1_Receive_Byte_BLOCKING(void);
+I2C_Status_Enum_t MASTER_I2C1_Receive_DataBlock_BLOCKING(uint8_t *datablock, uint8_t data_length);
+void MASTER_I2C1_Test_BLOCKING(void);
 
-#endif /*_CORE16F_ONE_WIRE_H*/
+
+
+#endif /*_CORE18F_I2C_H*/
 
 /*** End of File **************************************************************/

@@ -57,19 +57,19 @@
 * This enum provides standard definitions for enabled/disabled states, boolean values,
 * pin states, and common control settings.*/
 typedef enum
-{   DISABLED = 0U,	
-    ENABLED = 1U,	
-    FALSE = 0U,		
-    TRUE = 1U,
-    OFF = 0U,
-    ON = 1U,
+{   DISABLED = 0x0U,	
+    ENABLED = 0x1U,	
+    FALSE = 0x0U,		
+    TRUE = 0x1U,
+    OFF = 0x0U,
+    ON = 0x1U,
     LOW = 0x0U,			    
     HIGH = 0x1U, 
     NA = 0x0U,  //Does not apply / Not Used
-    CLEAR = 0U,
-    SET = 1U,
-    NO_DEVICE = 0U,
-    DEVICE_PRESENT = 1U,
+    CLEAR = 0x0U,
+    SET = 0x1U,
+    NO_DEVICE = 0x0U,
+    DEVICE_PRESENT = 0x1U,
 }LogicEnum_t;
 
 
