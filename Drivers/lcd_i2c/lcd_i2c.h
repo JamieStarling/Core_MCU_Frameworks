@@ -1,11 +1,11 @@
 /****************************************************************************
-* Title                 :   DS18B20 Driver
-* Filename              :   ds18b20.h
+* Title                 :   LCD I2C Drivers
+* Filename              :   lcd_i2c.h
 * Author                :   Jamie Starling
-* Origin Date           :   2024/10/10
+* Origin Date           :   2024/10/15
 * Version               :   1.0.0
 * Compiler              :   XC8
-* Target                :   PIC MCUs
+* Target                :   
 * Copyright             :   Jamie Starling
 * All Rights Reserved
 *
@@ -39,86 +39,93 @@
 /***************  CHANGE LIST *************************************************
 *
 *    Date    Version   Author         Description 
-*  
+*    2024/10/16  1.0.0       Jamie Starling  Initial Version
 *  
 *
 *****************************************************************************/
 
-#ifndef CORE16F_DS18B20_H
-#define CORE16F_DS18B20_H
-
+#ifndef _CORE_LCD_I2C_H
+#define _CORE_LCD_I2C_H
 /******************************************************************************
 * Includes
 *******************************************************************************/
+#include <xc.h>
+#include <stdint.h>			/* For standard type definitions */
 #include "../../core16F.h"
 
 /******************************************************************************
 * Constants
 *******************************************************************************/
-#define _DS18B20_READ_ROM_COMMAND 0x33
-#define _DS18B20_SKIP_ROM_COMMAND 0xCC
-#define _DS18B20_CONVERT_COMMAND 0x44
-#define _DS18B20_READ_SCRATCHPAD 0xBE
-#define _DS18B20_INVALID_TEMPERATURE 0xFF
+#define _LCD_RS_CMD 0 
+#define _LCD_RS_DATA 1 
+#define _LCD_CMD_4bit_Mode_1 0b00110011
+#define _LCD_CMD_4bit_Mode_2 0b00110010
+#define _LCD_CMD_Function_Set 0b00101000
+#define _LCD_CMD_Display_Set 0b00001110
+#define _LCD_CMD_CLEAR 0b00000001
 
-#define _DS18B20_MAX_RETRY_COUNT 10
-#define _DS18B20_TEMPERATURE_RESOLUTION_12bit .0625
+#define _LCD_LINE_1 0x00
+#define _LCD_LINE_2 0x40
+#define _LCD_LINE_3 0x14
+#define _LCD_LINE_4 0x54
+/******************************************************************************
+* Configuration
+*******************************************************************************/
 
-#define _DS18B20_ROM_SIZE 7
-#define _DS18B20_SCRATCHPAD_DATA_SIZE 8
-
-#define _DS18B20_9BIT_RESOLUTION 0x00
-#define _DS18B20_10BIT_RESOLUTION 0x20
-#define _DS18B20_11BIT_RESOLUTION 0x40
-#define _DS18B20_12BIT_RESOLUTION 0x60
-
-#define _DS18B20_CONVERSION_DELAY_MS 1000
-#define _DS18B20_RETRY_DELAY_MS 20
+/******************************************************************************
+* Macros
+*******************************************************************************/
 
 /******************************************************************************
 * Typedefs
 *******************************************************************************/
 typedef enum
 {
-    DS18B20_STATUS_OK,
-    DS18B20_STATUS_NO_DEVICE,
-    DS18B20_STATUS_CRC_FAILED,
-    DS18B20_STATUS_TEMPERATURE_CONVERSION_FAILED,
-    DS18B20_ERROR_GENERIC,
-    DS18B20_RESOLUTION_9BIT,
-    DS18B20_RESOLUTION_10BIT,
-    DS18B20_RESOLUTION_11BIT,
-    DS18B20_RESOLUTION_12BIT
-}DS18B20_StatusEnum_t;
+ LCD_I2C_OK,
+ LCD_I2C_GENERIC_ERROR,
+ LCD_I2C_INVALID_ADDRESS 
+}LCD_I2C_Status_Enum_t;
 
 
+typedef struct
+{
+    uint8_t RS : 1;
+    uint8_t RW : 1;
+    uint8_t EN : 1;
+    uint8_t BackLight : 1;
+    uint8_t LCD_DATA : 4;  
+}LCD_DATA_t;
+
+typedef union {
+    LCD_DATA_t bits;      // Access individual bits
+    uint8_t byte;         // Access the entire byte
+} LCD_DATA_ByteAccess;
+
+extern LCD_DATA_ByteAccess LCD_Data;
 
 /******************************************************************************
-***** DS18B20 Interface
+***** LCD_I2C Interface
 *******************************************************************************/
 typedef struct {
-  uint8_t (*Initialize)(void);   
-  float (*Read)(void);
-  int16_t (*ReadRaw)(void);
-  bool (*Present)(void);
-  DS18B20_StatusEnum_t(*GetResolution)(void);
-}DS18B20_Interface_t;
+  LCD_I2C_Status_Enum_t (*Initialize)(uint8_t address);
+  LCD_I2C_Status_Enum_t (*BlackLight)(uint8_t address, LogicEnum_t set_light);
+  LCD_I2C_Status_Enum_t (*Location)(uint8_t address, uint8_t row, uint8_t column);
+  LCD_I2C_Status_Enum_t (*Clear)(uint8_t address);
+  LCD_I2C_Status_Enum_t (*Write_Character)(uint8_t address, uint8_t character);
+  LCD_I2C_Status_Enum_t (*Write_String)(uint8_t address, char *StringData);
+}LCD_I2C_Interface_t;
 
-extern const DS18B20_Interface_t DS18B20;
-
-
-
+extern const LCD_I2C_Interface_t LCD;
 
 /******************************************************************************
 * Function Prototypes
 *******************************************************************************/
-uint8_t DS18B20_Init(void);
-uint8_t DS18B20_Read_Temperature(void);
-bool DS18B20_Present(void);
-float DS18B20_Get_TemperatureC(void);
-int16_t DS18B20_Get_TemperatureRAW(void);
-DS18B20_StatusEnum_t DS18B20_Return_Resolution(void);
-
-#endif /*CORE16F_DS18B20_H*/
+LCD_I2C_Status_Enum_t LCD_I2C_init(uint8_t address);
+LCD_I2C_Status_Enum_t LCD_I2C_BackLight(uint8_t address, LogicEnum_t set_light);
+LCD_I2C_Status_Enum_t LCD_I2C_Location(uint8_t address, uint8_t row, uint8_t column);
+LCD_I2C_Status_Enum_t LCD_I2C_Clear_Display(uint8_t address);
+LCD_I2C_Status_Enum_t LCD_I2C_Write_Character(uint8_t address, uint8_t character);
+LCD_I2C_Status_Enum_t LCD_I2C_Write_String(uint8_t address, char *StringData);
+#endif /*_CORE_LCD_I2C_H*/
 
 /*** End of File **************************************************************/
