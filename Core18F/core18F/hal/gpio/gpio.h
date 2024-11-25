@@ -1,11 +1,11 @@
 /****************************************************************************
-* Title                 :   Core8 GPIO Functions
+* Title                 :   Core MCU GPIO Functions
 * Filename              :   gpio.h
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/25
 * Version               :   1.0.0
 * Compiler              :   XC8
-* Target                :   Microchip PIC16F series
+* Target                :   Microchip PIC18F series
 * Copyright             :   © 2024 Jamie Starling
 * All Rights Reserved
 *
@@ -29,18 +29,11 @@
 *                           for details 
 *******************************************************************************/
 
-/*************** TODO *********************************************************
- * * 
- * 
- * 
-*****************************************************************************/
-
 /***************  CHANGE LIST *************************************************
 *
 *   Date        Version     Author          Description 
 *   2024/04/25  1.0.0       Jamie Starling  Initial Version
 *  
-*
 *****************************************************************************/
 
 #ifndef _CORE18F_GPIO_H
@@ -67,7 +60,6 @@ typedef struct {
 }GPIO_Interface_t;
 
 extern const GPIO_Interface_t GPIO;
-
 
 /******************************************************************************
 ***** Function Prototypes

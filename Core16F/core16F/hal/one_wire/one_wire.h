@@ -29,11 +29,6 @@
 *                           for details 
 *******************************************************************************/
 
-/*************** TODO *********************************************************
- * * 
- * 
- * 
-*****************************************************************************/
 
 /***************  CHANGE LIST *************************************************
 *
@@ -53,10 +48,6 @@
 /******************************************************************************
 * Configuration
 *******************************************************************************/
-#define OW_DIRECTION_REGISTER TRISCbits.TRISC0
-#define OW_PINDRIVER_REGISTER LATCbits.LATC0
-#define OW_PINREAD_REGISTER PORTCbits.RC0
-#define OW_PINANALOG_REGISTER ANSELCbits.ANSC0
 
 /*ONE WIRE RESET TIMINGS*/
 #define ONE_WIRE_RESET_DELAY_US 485
@@ -79,7 +70,7 @@
 *******************************************************************************/
 typedef struct {
   void (*Initialize)(void);
-  LogicEnum_t (*Reset)(void);
+  LogicEnum_t (*SendReset)(void);
   void (*WriteByte)(uint8_t data);
   uint8_t (*ReadByte)(void);
   uint8_t (*ReadBit)(void);

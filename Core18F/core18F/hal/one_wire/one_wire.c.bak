@@ -1,0 +1,371 @@
+/****************************************************************************
+* Title                 :   One Wire HAL
+* Filename              :   one_wire.c
+* Author                :   Jamie Starling
+* Origin Date           :   2024/08/20
+* Version               :   1.0.0
+* Compiler              :   XC8 
+* Target                :   Microchip PIC18F series 
+* Copyright             :   Jamie Starling
+* All Rights Reserved
+*
+* THIS SOFTWARE IS PROVIDED BY JAMIE STARLING "AS IS" AND ANY EXPRESSED
+* OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+* OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+* IN NO EVENT SHALL JAMIE STARLING OR ITS CONTRIBUTORS BE LIABLE FOR ANY
+* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+* STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+* IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+* THE POSSIBILITY OF SUCH DAMAGE.
+*
+*******************************************************************************/
+
+/******************************************************************************
+*                     LICENSED FOR NON-COMMERCIAL USE
+*                Visit http://jamiestarling.com/corelicense
+*                           for details 
+*******************************************************************************/
+
+/***************  CHANGE LIST *************************************************
+*
+*   Date        Version     Author          Description 
+*   2024/08/20  1.0.0       Jamie Starling  Initial Version
+*  
+*
+*****************************************************************************/
+
+/******************************************************************************
+* Includes
+*******************************************************************************/
+#include "one_wire.h"
+
+/******************************************************************************
+***** ONE WIRE Interface
+*******************************************************************************/
+const One_Wire_Interface_t ONE_WIRE = {
+  .Initialize = &ONE_WIRE_Init,
+  .SendReset = &ONE_WIRE_Reset,
+  .WriteByte =  &ONE_WIRE_Write_Byte,  
+  .ReadByte =  &ONE_WIRE_Read_Byte,
+  .ReadBit = &ONE_WIRE_Read_Bit
+};
+
+/******************************************************************************
+* Function Prototypes
+*******************************************************************************/
+void ONE_WIRE_Drive_Low(void);
+void ONE_WIRE_Drive_High(void);
+uint8_t ONE_WIRE_Read(void);
+void ONE_WIRE_Write_Bit(uint8_t write_bit);
+uint8_t ONE_WIRE_Read_Bit(void);
+
+/******************************************************************************
+* Functions
+*******************************************************************************/
+/******************************************************************************
+* Function : ONE_WIRE_Init()
+* Description: Initializes the one-wire bus by disabling the analog function and setting 
+* the pin as an input to prepare for communication.
+*
+*******************************************************************************/
+void ONE_WIRE_Init(void)
+{
+  OW_PINANALOG_REGISTER = 0;  //turn off analog  
+  OW_DIRECTION_REGISTER = 1;  //set pin as input
+}
+
+
+/******************************************************************************
+* Function : ONE_WIRE_Reset()
+*//** 
+* \b Description:
+*
+* Parameters:
+*   - None
+*
+* Returns:
+*   - LogicEnum_t: `DEVICE_PRESENT` if devices respond, `NO_DEVICE` if no response.
+*******************************************************************************/
+LogicEnum_t ONE_WIRE_Reset(void)
+{
+    
+  ONE_WIRE_Drive_Low(); 
+  __delay_us(ONE_WIRE_RESET_DELAY_US); // wait for 480us+
+
+  ONE_WIRE_Drive_High();    
+  __delay_us(ONE_WIRE_RESET_DELAY_DRIVE_HIGH_US);
+
+  uint8_t response = ONE_WIRE_Read();
+  __delay_us(ONE_WIRE_RESET_DELAY_READ_US); 
+
+  ONE_WIRE_Drive_High(); 
+  
+  return (response == 0) ? DEVICE_PRESENT : NO_DEVICE;   
+}
+
+/******************************************************************************
+* Function : ONE_WIRE_Drive_Low()
+* Description: Drives the one-wire bus low by setting the pin as an output and pulling it 
+* to a low logic level (0V).
+*
+*******************************************************************************/
+void ONE_WIRE_Drive_Low(void)
+{
+  OW_DIRECTION_REGISTER = 0;
+  OW_PINDRIVER_REGISTER = 0;  
+}
+
+/******************************************************************************
+* Function : ONE_WIRE_Drive_High()
+* Description: Releases the one-wire bus by setting the pin to a high logic level, allowing 
+* the pull-up resistor to maintain the line at a high voltage.
+*
+*******************************************************************************/
+void ONE_WIRE_Drive_High(void)
+{   
+  OW_DIRECTION_REGISTER = 1;  // Release the one-wire bus to go high
+   
+}
+
+/******************************************************************************
+* Function : ONE_WIRE_Read()
+* Description: Reads the current logic level of the one-wire bus, returning `1` if high 
+* (logic 1) or `0` if low (logic 0).
+*
+* Returns:
+*   - uint8_t: `1` if the bus is high, `0` if the bus is low.
+*******************************************************************************/
+uint8_t ONE_WIRE_Read(void)
+{
+  //uint8_t one_wire_data = 0;  
+  OW_DIRECTION_REGISTER = 1;  // Set pin as input
+  
+  return (OW_PINREAD_REGISTER) ? 1 : 0;
+ 
+  //if (OW_PINREAD_REGISTER){one_wire_data = 1;}
+  //else {one_wire_data = 0;}
+  //return one_wire_data;  
+}
+
+/******************************************************************************
+* Function : ONE_WIRE_Write_Bit()
+*//** 
+* \b Description:
+*
+* <DESCRIPTION>
+*  
+* PRE-CONDITION:  
+* PRE-CONDITION: 
+*
+* POST-CONDITION: 
+*
+* @param[in] 	
+*
+* @return 		
+*
+* \b Example:
+* @code
+* 	
+*
+* 	
+* @endcode
+*
+* 
+*
+* <br><b> - HISTORY OF CHANGES - </b>
+*  
+* <hr>
+*******************************************************************************/
+void ONE_WIRE_Write_Bit(uint8_t write_bit)
+{
+  if (write_bit)  //Write 1 to buss
+    {
+      ONE_WIRE_Drive_Low();
+      __delay_us(ONE_WIRE_WRITE_BIT_1_DELAY_DRIVE_LOW_US);
+      ONE_WIRE_Drive_High();
+      __delay_us(ONE_WIRE_WRITE_BIT_1_DELAY_DRIVE_HIGH_US);      
+    }
+  else  //Write 0 to buss
+    {
+       ONE_WIRE_Drive_Low();
+       __delay_us(ONE_WIRE_WRITE_BIT_0_DELAY_DRIVE_LOW_US);
+       ONE_WIRE_Drive_High();
+       __delay_us(ONE_WIRE_WRITE_BIT_0_DELAY_DRIVE_HIGH_US);      
+    }
+}
+
+/******************************************************************************
+* Function : ONE_WIRE_Read_Bit()
+*//** 
+* \b Description:
+*
+* This function writes a single bit (either 0 or 1) to the one-wire bus. The bit is written 
+* according to the one-wire protocol, where writing a `1` involves pulling the bus low for 
+* a short period followed by releasing it, and writing a `0` involves pulling the bus low for 
+* a longer period. The function controls the timing of the pulse based on the value of the bit.
+*
+* A `1` is written by driving the bus low for a shorter time (`6µs`) and then releasing the bus.
+* A `0` is written by driving the bus low for a longer time (`60µs`), then releasing the bus.
+*
+* PRE-CONDITION:  
+*    - The one-wire bus must be initialized using `ONE_WIRE_Init()`.
+*
+* POST-CONDITION: 
+*    - The specified bit (`0` or `1`) is written to the one-wire bus.
+*
+* @param[in] write_bit - The bit to be written to the one-wire bus (either `0` or `1`).
+*
+* @return void
+*
+* \b Example:
+* @code
+* 	
+* // Write a '1' bit to the one-wire bus
+* ONE_WIRE_Write_Bit(1);
+*
+* // Write a '0' bit to the one-wire bus
+* ONE_WIRE_Write_Bit(0);
+* 	
+* @endcode
+*
+* - The timing for writing bits is critical and follows the one-wire protocol specifications.
+* - Writing a bit involves pulling the bus low for a specific amount of time and then releasing it.
+* - Ensure that the one-wire bus is ready for writing before calling this function.
+*
+*
+* <br><b> - HISTORY OF CHANGES - </b>
+*  
+* <hr>
+*******************************************************************************/
+uint8_t ONE_WIRE_Read_Bit(void)
+{
+  uint8_t one_wire_data = 0;
+  //reading a bit 
+  ONE_WIRE_Drive_Low();
+  __delay_us(ONE_READ_BIT_DELAY_DRIVE_LOW_US);
+  //ONE_WIRE_High();
+  OW_DIRECTION_REGISTER = 1;
+  __delay_us(ONE_READ_BIT_DELAY_DRIVE_HIGH_US);
+  
+  one_wire_data = ONE_WIRE_Read();
+  
+   __delay_us(ONE_READ_BIT_DELAY_END_US);
+   return one_wire_data;
+}
+
+/******************************************************************************
+* Function : ONE_WIRE_Write_Byte()
+*//** 
+* \b Description:
+*
+* This function writes a full byte of data to the one-wire bus by sending each bit 
+* sequentially, starting with the least significant bit (LSB). It calls the 
+* `ONE_WIRE_Write_Bit()` function to transmit each bit, ensuring that the correct 
+* timing and protocol are followed for one-wire communication.
+*
+* The byte is shifted right after each bit is written, so the next bit can be sent. 
+* This process continues for all 8 bits of the byte, sending the LSB first and the 
+* most significant bit (MSB) last.
+*
+* PRE-CONDITION:  
+*    - The one-wire bus must be initialized using `ONE_WIRE_Init()`.
+*
+* POST-CONDITION: 
+*    - The full byte of data is written to the one-wire bus, one bit at a time.
+*
+* @param[in] data - The byte of data to be transmitted to the one-wire bus.
+*
+* @return void		
+*
+* \b Example:
+* @code
+* 	
+* // Write the byte 0xA5 (binary: 10100101) to the one-wire bus
+* ONE_WIRE_Write_Byte(0xA5);
+* 	
+* @endcode
+*
+* \b Notes:
+* - This function sends the least significant bit (LSB) first, followed by the remaining bits.
+* - Ensure that the one-wire bus is ready for communication before calling this function.
+* - The function internally calls `ONE_WIRE_Write_Bit()` for each bit in the byte.
+*
+*
+* <br><b> - HISTORY OF CHANGES - </b>
+*  
+* <hr>
+*******************************************************************************/
+void ONE_WIRE_Write_Byte(uint8_t data)
+{
+  uint8_t loop_counter;
+  
+  for (loop_counter = 0; loop_counter < 8; loop_counter++)
+    {
+      ONE_WIRE_Write_Bit(data & 0x01); //Sending LS-bit first
+      data >>= 1; // shift the data byte for the next bit to send
+    }
+  
+}
+
+/******************************************************************************
+* Function : ONE_WIRE_Read_Byte()
+*//** 
+* \b Description:
+*
+* This function reads a full byte of data from the one-wire bus by receiving each bit 
+* sequentially, starting with the least significant bit (LSB). It calls the 
+* `ONE_WIRE_Read_Bit()` function to receive each bit and assembles them into a byte.
+*
+* The function shifts the received byte right after each bit is read, preparing it for the 
+* next bit to be inserted. This process continues for all 8 bits of the byte, reading 
+* the LSB first and the most significant bit (MSB) last.
+*
+* PRE-CONDITION:  
+*    - The one-wire bus must be initialized using `ONE_WIRE_Init()`.
+*    - A start condition or previous operation must have been performed to signal the start of communication.
+*
+* POST-CONDITION: 
+*    - A full byte of data is read from the one-wire bus, one bit at a time.
+*
+* @param[in] None
+*
+* @return uint8_t
+*    - The byte of data received from the one-wire bus.		
+*
+* \b Example:
+* @code
+* 	
+* // Read a byte of data from the one-wire bus
+* uint8_t received_data = ONE_WIRE_Read_Byte();
+*
+* // Process the received data
+* 	
+* @endcode
+*
+* \b Notes:
+* - This function reads the least significant bit (LSB) first, followed by the remaining bits.
+* - Ensure that the one-wire bus is in a state where it can receive data before calling this function.
+* - The function internally calls `ONE_WIRE_Read_Bit()` for each bit in the byte.
+*
+*
+* <br><b> - HISTORY OF CHANGES - </b>
+*  
+* <hr>
+*******************************************************************************/
+uint8_t ONE_WIRE_Read_Byte(void)
+{
+  uint8_t loop_counter, result = 0;
+  
+  for (loop_counter = 0; loop_counter < 8; loop_counter++)
+	{		
+		result >>= 1; 				// shift the result to get it ready for the next bit to receive
+		if (ONE_WIRE_Read_Bit()){result |= 0x80;} // if result is one, then set MS-bit						
+	}
+	return result;  
+}
+
+
+/*** End of File **************************************************************/

@@ -30,12 +30,6 @@
 *                           for details 
 *******************************************************************************/
 
-/*************** TODO *********************************************************
- * * 
- * 
- * 
-*****************************************************************************/
-
 /***************  CHANGE LIST *************************************************
 *
 *   Date        Version     Author          Description 
@@ -50,17 +44,36 @@
 ***** Includes
 *******************************************************************************/
 #include "../../core18F.h"
+
+/******************************************************************************
+* Defines
+*******************************************************************************/
+#define _SERIAL1_TIMEOUT_VALUE 2048
+
+/******************************************************************************
+* Serial Error Codes
+******************************************************************************/
+typedef enum
+{    
+  OK,
+  FRAMMING_ERROR,
+  OVERRUN_ERROR,
+  TIMEOUT,
+}SERIAL1_Status_Enum_t;
+
 /******************************************************************************
 ***** SERIAL1 Interface
 *******************************************************************************/
 typedef struct {
   void (*Initialize)(SerialBaudEnum_t BaudSelect); 
-  void (*WriteByte)(uint8_t SerialData);
-  void (*WriteString)(char *StringData);
+  SERIAL1_Status_Enum_t (*WriteByte)(uint8_t SerialData);
+  SERIAL1_Status_Enum_t (*WriteString)(char *StringData);
   LogicEnum_t (*IsDataAvailable)(void);
   LogicEnum_t (*IsTransmitComplete)(void);
   uint8_t (*ReadByte)(void);
   LogicEnum_t (*IsTransmitBufferReady)(void);  
+  SERIAL1_Status_Enum_t (*IsError)(void);
+  void (*ClearErrors)(void);
 }SERIAL1_Interface_t;
 
 extern const SERIAL1_Interface_t SERIAL1;
@@ -71,13 +84,14 @@ extern const SERIAL1_Interface_t SERIAL1;
 *******************************************************************************/
 
 void SERIAL1_Init(SerialBaudEnum_t BaudSelect);
-void SERIAL1_WriteByte(uint8_t SerialData);
-void SERIAL1_WriteString(char *StringData);
+SERIAL1_Status_Enum_t SERIAL1_WriteByte(uint8_t SerialData);
+SERIAL1_Status_Enum_t SERIAL1_WriteString(char *StringData);
 LogicEnum_t SERIAL1_HasReceiveData(void);
 LogicEnum_t SERIAL1_IsTSREmpty(void);
 uint8_t SERIAL1_GetReceivedData(void);
 LogicEnum_t SERIAL1_IsTXBufferEmpty(void);
-
+SERIAL1_Status_Enum_t SERIAL1_IsError(void);
+void SERIAL1_Clear_Error(void);
 #endif /*_CORE18F_SERIAL1_H*/
 
 /*** End of File **************************************************************/

@@ -1,12 +1,12 @@
 /****************************************************************************
-* Title                 :   PWM3 Functions
+* Title                 :   CORE MCU Framework : PWM3 for 18F devices
 * Filename              :   pwm3.h
 * Author                :   Jamie Starling
-* Origin Date           :   2024/04/25
+* Origin Date           :   2024/11/21
 * Version               :   1.0.0
-* Compiler              :   XC8
-* Target                :   Microchip PIC16F series
-* Copyright             :   © 2024 Jamie Starling
+* Compiler              :   XC8 
+* Target                :   PIC18F Family  
+* Copyright             :   Jamie Starling
 * All Rights Reserved
 *
 * THIS SOFTWARE IS PROVIDED BY JAMIE STARLING "AS IS" AND ANY EXPRESSED
@@ -29,27 +29,41 @@
 *                           for details 
 *******************************************************************************/
 
-/*************** TODO *********************************************************
- * * 
- * 
- * 
-*****************************************************************************/
-
-
 /***************  CHANGE LIST *************************************************
 *
-*   Date        Version     Author          Description 
-*   2024/04/25  1.0.0       Jamie Starling  Initial Version
+*    Date    Version   Author         Description 
 *  
-*
 *****************************************************************************/
 
-#ifndef _CORE18F_PWM3_H
-#define _CORE18F_PWM3_H
+#ifndef _CORE_PWM3_H_
+#define _CORE_PWM3_H_
 /******************************************************************************
 * Includes
 *******************************************************************************/
 #include "../../core18F.h"
+
+/******************************************************************************
+* Constants
+*******************************************************************************/
+
+/******************************************************************************
+* Configuration
+*******************************************************************************/
+
+/******************************************************************************
+***** PWM Interface
+*******************************************************************************/
+typedef struct {
+  void (*Initialize)(GPIO_Ports_t PortPin,PWM_ConfigEnum_t PWM_Config);   
+  void (*Output)(LogicEnum_t setState);
+  void (*DutyCycle)(uint16_t dutyValue);
+}PWM3_Interface_t;
+
+extern const PWM3_Interface_t PWM3;
+
+/******************************************************************************
+* Variables
+*******************************************************************************/
 
 /******************************************************************************
 * Function Prototypes
@@ -58,6 +72,7 @@ void PWM3_Init(GPIO_Ports_t PortPin,PWM_ConfigEnum_t PWM_Config);
 void PWM3_Output_Enable(LogicEnum_t setState);
 void PWM3_Set_DutyCycle(uint16_t dutyValue);
 
-#endif /*_CORE18F_PWM3_H*/
+
+#endif /*_CORE_PWM1_H_*/
 
 /*** End of File **************************************************************/

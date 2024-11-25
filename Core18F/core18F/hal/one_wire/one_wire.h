@@ -3,9 +3,9 @@
 * Filename              :   one_wire.h
 * Author                :   Jamie Starling
 * Origin Date           :   2024/08/20
-* Version               :   1.0.0
+* Version               :   1.0.2
 * Compiler              :   XC8
-* Target                :   Microchip PIC16F series
+* Target                :   Microchip PIC18F series
 * Copyright             :   Jamie Starling
 * All Rights Reserved
 *
@@ -29,11 +29,6 @@
 *                           for details 
 *******************************************************************************/
 
-/*************** TODO *********************************************************
- * * 
- * 
- * 
-*****************************************************************************/
 
 /***************  CHANGE LIST *************************************************
 *
@@ -43,8 +38,8 @@
 *
 *****************************************************************************/
 
-#ifndef _CORE18F_ONE_WIRE_H
-#define _CORE18F_ONE_WIRE_H
+#ifndef _CORE16F_ONE_WIRE_H
+#define _CORE16F_ONE_WIRE_H
 /******************************************************************************
 * Includes
 *******************************************************************************/
@@ -53,13 +48,9 @@
 /******************************************************************************
 * Configuration
 *******************************************************************************/
-#define OW_DIRECTION_REGISTER TRISAbits.TRISA0
-#define OW_PINDRIVER_REGISTER LATAbits.LATA0
-#define OW_PINREAD_REGISTER PORTAbits.RA0
-#define OW_PINANALOG_REGISTER ANSELAbits.ANSA0
 
 /*ONE WIRE RESET TIMINGS*/
-#define ONE_WIRE_RESET_DELAY_US 480
+#define ONE_WIRE_RESET_DELAY_US 485
 #define ONE_WIRE_RESET_DELAY_DRIVE_HIGH_US 70
 #define ONE_WIRE_RESET_DELAY_READ_US 410
 
@@ -73,6 +64,21 @@
 #define ONE_READ_BIT_DELAY_DRIVE_LOW_US 5
 #define ONE_READ_BIT_DELAY_DRIVE_HIGH_US 2
 #define ONE_READ_BIT_DELAY_END_US 45
+
+/******************************************************************************
+***** ONE WIRE Interface
+*******************************************************************************/
+typedef struct {
+  void (*Initialize)(void);
+  LogicEnum_t (*SendReset)(void);
+  void (*WriteByte)(uint8_t data);
+  uint8_t (*ReadByte)(void);
+  uint8_t (*ReadBit)(void);
+}One_Wire_Interface_t;
+
+extern const One_Wire_Interface_t ONE_WIRE;
+
+
 /******************************************************************************
 * Function Prototypes
 *******************************************************************************/
@@ -82,6 +88,6 @@ void ONE_WIRE_Write_Byte(uint8_t data);
 uint8_t ONE_WIRE_Read_Byte(void);
 uint8_t ONE_WIRE_Read_Bit(void);
 
-#endif /*_CORE18F_ONE_WIRE_H*/
+#endif /*_CORE16F_ONE_WIRE_H*/
 
 /*** End of File **************************************************************/

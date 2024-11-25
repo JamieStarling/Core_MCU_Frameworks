@@ -29,18 +29,11 @@
 *                           for details 
 *******************************************************************************/
 
-/*************** TODO *********************************************************
- * 
- * 
- * 
-*****************************************************************************/
-
 /***************  CHANGE LIST *************************************************
 *
 *   Date        Version     Author          Description 
 *   2024/04/25  1.0.0       Jamie Starling  Initial Version
 *  
-*
 *****************************************************************************/
 
 /******************************************************************************
@@ -54,35 +47,14 @@
 *******************************************************************************/
 /******************************************************************************
 * Function : ISR_GIE_Disable
-*//** 
-* \b Description:
+* Description: Enables or disables global interrupts by setting or clearing the GIE bit 
+*   in the INTCON register, based on the `setState` parameter.
 *
-* Enables or disables global interrupts.
-* This function enables or disables global interrupts by setting the GIE bit
-* in the INTCON register. It is controlled by the `setState` parameter.
+* Parameters:
+*   - setState (LogicEnum_t): Set to ENABLED to enable global interrupts or 
+*     DISABLED to disable them.
 *  
-* PRE-CONDITION:  The interrupt source should be configured before enabling global interrupts.
-*
-* POST-CONDITION: GIE flag is set based on `setState` parameter.
-*
-* @param[in] setState  LogicEnum_t value to either enable (ENABLED) or disable (DISABLED) global interrupts.	
-*
-* @return 		
-*
-* \b Example:
-* @code
-* ISR_Global_Interrupt(ENABLED);  // Enable global interrupts
-* ISR_Global_Interrupt(DISABLED); // Disable global interrupts
-* 	
-* @endcode
-*
-* 
-*
-* <br><b> - HISTORY OF CHANGES - </b>
-*  
-* <hr>
 *******************************************************************************/
-
 void ISR_Global_Interrupt(LogicEnum_t setState)
 {
   INTCONbits.GIE = setState;
@@ -90,45 +62,29 @@ void ISR_Global_Interrupt(LogicEnum_t setState)
 
 /******************************************************************************
 * Function : ISR_Peripheral_Interrupt
-*//** 
-* \b Description:
+* Description: Enables or disables peripheral interrupts by setting or clearing the PEIE 
+*   bit in the INTCON register, based on the `setState` parameter.
 *
-* Enables or disables peripheral interrupts.
-* This function enables or disables peripheral interrupts by setting the PEIE bit
-* in the INTCON register. It is controlled by the `setState` parameter.
+* Parameters:
+*   - setState (LogicEnum_t): Set to ENABLED to enable peripheral interrupts or 
+*     DISABLED to disable them.
 * 
-* PRE-CONDITION: The interrupt source should be configured before enabling peripheral interrupts. 
-*
-* POST-CONDITION: PEIE flag is set based on `setState` parameter.
-*
-* @param[in] setState  LogicEnum_t value to either enable (ENABLED) or disable (DISABLED) peripheral interrupts.
-*
-* @return 		
-*
-* \b Example:
-* @code
-* ISR_Peripheral_Interrupt(ENABLED);  // Enable peripheral interrupts
-* ISR_Peripheral_Interrupt(DISABLED); // Disable peripheral interrupts	
-*
-* 	
-* @endcode
-*
-* 
-*
-* <br><b> - HISTORY OF CHANGES - </b>
-*  
-* <hr>
 *******************************************************************************/
 void ISR_Peripheral_Interrupt(LogicEnum_t setState)
 {
   INTCONbits.PEIE = setState;
 }
 
-
+/******************************************************************************
+* Function : ISR_Enable_System_Default()
+* Description: Enables global interrupts and, if configured, peripheral interrupts by 
+* calling `ISR_Global_Interrupt` and `ISR_Peripheral_Interrupt`.
+*
+*******************************************************************************/
 void ISR_Enable_System_Default(void)
 {  
     #ifdef _CORE16F_ENABLE_PERIPHERAL_INTERRUPT
-    ISR_Peripheral_Interrupt(ENABLED);
+        ISR_Peripheral_Interrupt(ENABLED);
     #endif /*_CORE16F_ENABLE_PERIPHERAL_INTERRUPT*/
     
     ISR_Global_Interrupt(ENABLED);  

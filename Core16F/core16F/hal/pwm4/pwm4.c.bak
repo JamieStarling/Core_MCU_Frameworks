@@ -1,0 +1,159 @@
+/****************************************************************************
+* Title                 :   PWM4 Functions
+* Filename              :   pwm4.c
+* Author                :   Jamie Starling
+* Origin Date           :   2024/04/24
+* Version               :   1.0.1
+* Compiler              :   XC8
+* Target                :   Microchip PIC16F series 
+* Copyright             :   © 2024 Jamie Starling
+* All Rights Reserved
+*
+* THIS SOFTWARE IS PROVIDED BY JAMIE STARLING "AS IS" AND ANY EXPRESSED
+* OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+* OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+* IN NO EVENT SHALL JAMIE STARLING OR ITS CONTRIBUTORS BE LIABLE FOR ANY
+* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+* STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+* IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+* THE POSSIBILITY OF SUCH DAMAGE.
+*
+*******************************************************************************/
+
+/******************************************************************************
+*                     LICENSED FOR NON-COMMERCIAL USE
+*                Visit http://jamiestarling.com/corelicense
+*                           for details 
+*******************************************************************************/
+
+/***************  CHANGE LIST *************************************************
+*
+*   Date        Version     Author          Description 
+*   2024/04/25  1.0.0       Jamie Starling  Initial Version
+*  
+*
+*****************************************************************************/
+
+/******************************************************************************
+* Includes
+*******************************************************************************/
+#include "pwm4.h"
+#include "../pps/pps.h"
+#include "../tmr2/tmr2.h"
+
+/******************************************************************************
+***** PWM Interface
+*******************************************************************************/
+const PWM4_Interface_t PWM4 = {
+  .Initialize = &PWM4_Init,
+  .Output = &PWM4_Output_Enable,
+  .DutyCycle = &PWM4_Set_DutyCycle  
+};
+
+/******************************************************************************
+* Functions
+*******************************************************************************/
+/******************************************************************************
+* Function : PWM4_Init(PortPin)
+* Description: Initializes the PWM4 module on the specified GPIO pin for Pulse Width Modulation (PWM) output.
+*
+* Parameters:
+*   - PortPin (GPIO_Ports_t): The GPIO pin for PWM output (e.g., PORTC_5).
+*   - PWM_Config_Select (PWM_ConfigEnum_t): The PWM configuration to use (e.g., PWM_8bit).
+*
+*******************************************************************************/
+void PWM4_Init(GPIO_Ports_t PortPin,PWM_ConfigEnum_t PWM_Config_Select)
+{     
+  PPS_MapOutput(PortPin,PPSOUT_PWM4OUT);
+  
+  PR2 = PWM_Config[PWM_Config_Select].PR2_Value;
+  TMR2_Set_Clock_Source(TMR2_FOSC_D4); // Set Timer2 clock source to FOSC/4
+  TMR2_Set_Prescaler_Rate(PWM_Config[PWM_Config_Select].T2_Prescale_Value);  // Set Timer2 prescaler
+  TMR2_Enable(ENABLED);  // Enable Timer2
+   
+  PWM4CONbits.PWM4OUT = 0x01;  // Enable PWM output
+  PWM4CONbits.PWM4EN = 0x01;  // Enable PWM       
+}
+
+/******************************************************************************
+* Function : PWM3_Output_Enable()
+* Description:Enables or disables the PWM3 output on the selected GPIO pin by modifying 
+*   the PWM3 output enable bit.
+*
+* Parameters:
+*   - setState (LogicEnum_t): ENABLED to enable the output, DISABLED to disable it.
+*
+* 
+*******************************************************************************/
+void PWM4_Output_Enable(LogicEnum_t setState)
+{
+  PWM3CONbits.PWM4OUT = (setState == ENABLED) ? 0x01 : 0x00;  
+}
+
+
+/******************************************************************************
+* Function : PWM4_Set_DutyCycle()
+*//** 
+* \b Description:
+*
+* This function sets the duty cycle of the PWM4 output. The duty cycle represents 
+* the proportion of time that the PWM signal stays HIGH during one complete period, 
+* typically expressed as a percentage. A 50% duty cycle means the signal stays HIGH 
+* for half of the period and LOW for the other half.
+*
+* The function takes a 10-bit value representing the desired duty cycle and writes 
+* it to the PWM4 duty cycle registers (PWM4DCL and PWM4DCH). The duty cycle value 
+* determines the HIGH-time of the PWM signal.
+*
+* The valid range for `dutyValue` depends on the PWM configuration and clock frequency:
+* - At 8 MHz, the valid range is 0 - 408, with 204 representing a 50% duty cycle.
+* - At 16 MHz, the valid range is 0 - 1024, with 512 representing a 50% duty cycle.
+*
+* PRE-CONDITION:  
+*    - The PWM4 module must be initialized using `PWM4_Init()`.
+*    - The desired duty cycle should be calculated and passed as a 10-bit value.
+*
+* POST-CONDITION: 
+*    - The PWM4 output will have the specified duty cycle.
+*
+* @param[in] dutyValue - The 10-bit duty cycle value, where 0 represents 0% duty 
+*                        cycle and the maximum value represents 100% duty cycle.
+*
+*
+* @return void		
+*
+* \b Example:
+* @code
+* 	
+* // Set the PWM4 duty cycle to 50% at 16 MHz clock
+* PWM4_Set_DutyCycle(512);  // 512 is 50% duty cycle at 16 MHz
+*
+* // Set the PWM4 duty cycle to 75%
+* PWM4_Set_DutyCycle(768);  // 768 is 75% duty cycle at 16 MHz
+* 	
+* @endcode
+*
+* \b Notes:
+* - The duty cycle value is divided into two registers: PWM4DCL for the lower 2 bits, 
+*   and PWM4DCH for the upper 8 bits.
+* - Ensure that the value of `dutyValue` is within the valid range for your clock frequency 
+*   and PWM configuration.
+*
+* <br><b> - HISTORY OF CHANGES - </b>
+*  
+* <hr>
+*******************************************************************************/
+
+void PWM4_Set_DutyCycle(uint16_t dutyValue)
+{
+    //2 LSB's of dutyValue
+    PWM4DCL = (uint8_t)(dutyValue << 6);
+    //8 MSB's of dutyValue
+    PWM4DCH = (uint8_t)(dutyValue >> 2);
+    
+}
+
+/*** End of File **************************************************************/

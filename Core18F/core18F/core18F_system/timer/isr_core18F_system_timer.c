@@ -1,9 +1,9 @@
 /****************************************************************************
-* Title                 :   Core18F System Timer Functions
+* Title                 :   Core MCU System Timer Functions
 * Filename              :   isr_core18F_system_timer.c
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/25
-* Version               :   1.0.0
+* Version               :   1.0.1
 * Compiler              :   XC8
 * Target                :   Microchip PIC18F series  
 * Copyright             :   Jamie Starling
@@ -29,18 +29,13 @@
 *                           for details 
 *******************************************************************************/
 
-/*************** TODO *********************************************************
- * 
- * 
- * 
+/***************  CHANGE LIST *************************************************
+*
+*   Date        Version     Author          Description 
+*   2024/04/25  1.0.0   Jamie Starling  Initial Version
+*   2024/10/28  1.0.1   Jamie Starling  Optimized ISR Function
+*
 *****************************************************************************/
-
-
-/*************** CHANGE LOG ***************************************************
-*
-*    Date    Version   Author         Description 
-*
-*******************************************************************************/
 
 /******************************************************************************
 * Includes
@@ -55,7 +50,7 @@
 /******************************************************************************
 * Variables
 *******************************************************************************/
-volatile uint32_t CORE18F_SYSTEM_TIMER_Overflow_Count = 0;
+//volatile uint32_t CORE18F_SYSTEM_TIMER_Overflow_Count = 0;
 volatile uint32_t CORE18F_SYSTEM_TIMER_Millis = 0;
 
 
@@ -64,32 +59,9 @@ volatile uint32_t CORE18F_SYSTEM_TIMER_Millis = 0;
 *******************************************************************************/
 /******************************************************************************
 * Function : ISR_CORE18F_SYSTEM_TIMER_Init()
-*//** 
-* \b Description:
+* Description: Initializes Timer0 to generate 1ms ticks at 32MHz, setting up the timer 
+* mode, clock source, prescaler, and enabling interrupts.
 *
-* Preforms the initialization of the System timer tick. 
-* 
-*  
-* PRE-CONDITION:  
-* PRE-CONDITION: 
-*
-* POST-CONDITION: 
-*
-* @param[in] 	
-*
-* @return 		
-*
-* \b Example:
-* @code
-* 	
-*
-* 	
-* @endcode
-*
-* 
-*
-* <br><b> - HISTORY OF CHANGES - </b>
-*  
 *******************************************************************************/
 void ISR_CORE18F_SYSTEM_TIMER_Init(void)
 {
@@ -112,69 +84,27 @@ void ISR_CORE18F_SYSTEM_TIMER_Init(void)
 
 /******************************************************************************
 * Function : ISR_CORE18F_SYSTEM_TIMER_ISR()
-*//** 
-* \b Description:
+* Description: Interrupt Service Routine for Timer0 that increments the millisecond counter
+* whenever the Timer0 overflow flag is set. 
 *
-* Interrupt function that increments the timer values - add to ISR code  
-* 
-* PRE-CONDITION:  
-* PRE-CONDITION: 
-*
-* POST-CONDITION: 
-*
-* @param[in] 	
-*
-* @return 		
-*
-* \b Example:
-* @code
-* 	
-*
-* 	
-* @endcode
-*
-* 
-*
-* <br><b> - HISTORY OF CHANGES - </b>
-
+* - HISTORY OF CHANGES - 
+* 2024/10/28 1.0.1 Optimized ISR Function
 *******************************************************************************/
 void ISR_CORE18F_SYSTEM_TIMER_ISR(void)
 {   
-  TMR0_Clear_Interrupt_Flag();
-  uint32_t time = CORE18F_SYSTEM_TIMER_Millis;
-  time += _CORE18F_SYSTEM_TIMER_MILLIS_INC;
-  CORE18F_SYSTEM_TIMER_Millis = time;
-  CORE18F_SYSTEM_TIMER_Overflow_Count++;
+  PIR3bits.TMR0IF = 0; //Clear Timer0 Interrupt Flag
+  CORE18F_SYSTEM_TIMER_Millis += _CORE18F_SYSTEM_TIMER_MILLIS_INC;
  }   
 
 
 /******************************************************************************
 * Function : ISR_CORE18F_SYSTEM_TIMER_GetMillis()
-*//** 
-* \b Description:
+* Description: Returns the number of milliseconds elapsed since the system timer was 
+* initialized. Disables global interrupts momentarily to ensure a consistent 
+* read of the `CORE16F_SYSTEM_TIMER_Millis` variable.
 *
-* Returns the number of milliseconds that has passed since the system was started.  
-*
-* PRE-CONDITION:  
-* PRE-CONDITION: 
-*
-* POST-CONDITION: 
-*
-* @param[in] 	
-*
-* @return 		
-*
-* \b Example:
-* @code
-* 	
-*
-* 	
-* @endcode
-*
-* 
-*
-* <br><b> - HISTORY OF CHANGES - </b>
-
+* Returns:
+*   - (uint32_t): The elapsed time in milliseconds.
 *******************************************************************************/
 uint32_t ISR_CORE18F_SYSTEM_TIMER_GetMillis(void)
 {

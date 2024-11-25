@@ -1,11 +1,11 @@
 /****************************************************************************
-* Title                 :   Core8 GPIO Digital Functions
+* Title                 :   Core MCU GPIO Digital Functions
 * Filename              :   gpio.c
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/25
 * Version               :   1.0.0
 * Compiler              :   XC8 
-* Target                :   Microchip PIC16F series 
+* Target                :   Microchip PIC18F series 
 * Copyright             :   © 2024 Jamie Starling
 * All Rights Reserved
 *
@@ -47,6 +47,17 @@
 * Includes
 *******************************************************************************/
 #include "gpio.h"
+
+
+/******************************************************************************
+* Interface
+*******************************************************************************/
+const GPIO_Interface_t GPIO = {
+  .ModeSet = &GPIO_SetDirection,
+  .PinWrite = &GPIO_WritePortPin,
+  .PinToggle = &GPIO_TogglePortPin,
+  .PinRead =  &GPIO_ReadPortPin
+};
 
 /******************************************************************************
 ***** Local Function Prototypes
@@ -94,67 +105,38 @@ void GPIO_EnableWPUA (GPIO_Ports_t PortPin);
 
 *******************************************************************************/
 void GPIO_SetDirection(GPIO_Ports_t PortPin, PinDirectionEnum_t PinDirection)
-{  
-   //Variables that holds the registers of the Direction, Analog and PIN BitMask.
-   uint8_t *regDirection_ptr, *regAnalog_ptr, pinBitMask, *regODCON_ptr;
-   
-   //Get the BitMask of the PIN    
-   pinBitMask = GPIO_PinBitMask_LU[PortPin];
-   
-    //Get the register that controls the direction for the Pin
-   regDirection_ptr = (uint8_t*) GPIO_DirectionRegister_LU[PortPin];    
-   
-   //Get the register that controls the analog for the Pin
-   regAnalog_ptr = (uint8_t*) GPIO_AnalogRegister_LU[PortPin];   
-          
-    //If PIN is to be set as Input - Set the associated Register Bit
-   if (PinDirection == INPUT)
-    {
-       //Set the bit in the Direction Register with OR
-        *regDirection_ptr |= pinBitMask;    
-        
-       //Invert the Pin Mask to clear the Analog Register with AND         
-        *regAnalog_ptr &= ~pinBitMask;        
-    }
-   
-   else if (PinDirection == OUTPUT)
-   //If PIN is to be set as OUTPUT - Clear the associated Register Bit  
-    {
-       //Invert the Mask - Clear the bit in the Direction Register and Analog Register
-       *regDirection_ptr &= ~pinBitMask; 
-       *regAnalog_ptr &= ~pinBitMask;        
-    }  
-   
-   else if (PinDirection == INPUT_W_PULLUP)
-   //If PIN is to be set as INPUT with PullUp 
-   {
-       //Set the bit in the Direction Register with OR
-        *regDirection_ptr |= pinBitMask;    
-        
-       //Invert the Pin Mask to clear the Analog Register with AND         
-        *regAnalog_ptr &= ~pinBitMask;   
-        
-        GPIO_EnableWPUA(PortPin);
-    }
-
-    else if (PinDirection == ANALOG)
-    //If Pin is to be set as analog input
-    {
-        //Invert the Mask - Clear the bit in the Direction Register and Set Analog Register
-        *regDirection_ptr &= ~pinBitMask;         
-        *regAnalog_ptr |= pinBitMask; 
-    }
-   
-   else if (PinDirection == OPEN_DRAIN)
-   //If PIN is to be set as OPEN_DRAIN - Clear the associated Register Bit  
-    {
-       //Invert the Mask - Clear the bit in the Direction Register and Analog Register
-       *regDirection_ptr &= ~pinBitMask; 
-       *regAnalog_ptr &= ~pinBitMask;
-       //Set ODCON Bit
-       regODCON_ptr = (uint8_t*) GPIO_ODCONRegister_LU[PortPin];
-       *regODCON_ptr |= pinBitMask;
-    }  
+{           
+  switch (PinDirection) {
+    case INPUT:      //If PIN is to be set as Input - Set the associated Register Bit
+        *(GPIO_Register_LU[PortPin].direction_reg) |= (GPIO_Register_LU[PortPin].pinmask);    //Set the bit in the Direction Register with OR       
+        *(GPIO_Register_LU[PortPin].analog_reg) &= ~(GPIO_Register_LU[PortPin].pinmask);     //Invert the Pin Mask to clear the Analog Register with AND                
+        break;
+       
+    case OUTPUT:    //If PIN is to be set as OUTPUT - Clear the associated Register Bit  
+        *(GPIO_Register_LU[PortPin].direction_reg) &= ~(GPIO_Register_LU[PortPin].pinmask);  //Invert the Mask - Clear the bit in the Direction Register and Analog Register
+        *(GPIO_Register_LU[PortPin].analog_reg) &= ~(GPIO_Register_LU[PortPin].pinmask);
+        break;
+    
+    case INPUT_W_PULLUP:   //If PIN is to be set as INPUT with PullUp 
+       *(GPIO_Register_LU[PortPin].direction_reg) |= (GPIO_Register_LU[PortPin].pinmask);   //Set the bit in the Direction Register with OR
+       *(GPIO_Register_LU[PortPin].analog_reg) &= ~(GPIO_Register_LU[PortPin].pinmask);     //Invert the Pin Mask to clear the Analog Register with AND  
+       GPIO_EnableWPUA(PortPin);
+       break;
+       
+    case ANALOG: //If Pin is to be set as analog input
+       *(GPIO_Register_LU[PortPin].direction_reg) |= (GPIO_Register_LU[PortPin].pinmask);  //Set the bit in the Direction Register with OR Along with Analog  
+       *(GPIO_Register_LU[PortPin].analog_reg) |= (GPIO_Register_LU[PortPin].pinmask);
+       break;
+       
+    case OPEN_DRAIN: //If PIN is to be set as OPEN_DRAIN - Clear the associated Register Bit
+       *(GPIO_Register_LU[PortPin].direction_reg) &= ~(GPIO_Register_LU[PortPin].pinmask);  //Invert the Mask - Clear the bit in the Direction Register and Analog Register
+       *(GPIO_Register_LU[PortPin].analog_reg) &= ~(GPIO_Register_LU[PortPin].pinmask);       
+       *(GPIO_Register_LU[PortPin].odcon_reg) |= (GPIO_Register_LU[PortPin].pinmask);
+       break;
+       
+    default:
+        break;      
+    }     
 }
 
 /******************************************************************************
@@ -192,18 +174,8 @@ void GPIO_SetDirection(GPIO_Ports_t PortPin, PinDirectionEnum_t PinDirection)
 * <hr>
 *******************************************************************************/
 void GPIO_EnableWPUA (GPIO_Ports_t PortPin)
-{
-   //var that holds the register of the WeakPull Up and PIN BitMask.
-   uint8_t *regWPU_ptr, pinBitMask;
-   
-   //Get the BitMask of the PIN    
-   pinBitMask = GPIO_PinBitMask_LU[PortPin];
-   
-    //Get the register that controls the direction for the Pin
-   regWPU_ptr = (uint8_t*) GPIO_WPURegister_LU[PortPin];   
-    
-   //Set the bit in the WPU with OR
-        *regWPU_ptr |= pinBitMask;           
+{      
+   *(GPIO_Register_LU[PortPin].wpu_reg) |= (GPIO_Register_LU[PortPin].pinmask); //Set the bit in the WPU with OR          
 }	
 
 /******************************************************************************
@@ -254,27 +226,13 @@ void GPIO_EnableWPUA (GPIO_Ports_t PortPin)
 *******************************************************************************/
 void GPIO_WritePortPin (GPIO_Ports_t PortPin, LogicEnum_t PinLevel)
 {    
-   //var that holds the registers of the Port Write and PIN BitMask.
-   uint8_t *regPortWrite_ptr, pinBitMask;
-   
-   //Get the BitMask of the PIN    
-   pinBitMask = GPIO_PinBitMask_LU[PortPin];
-   
-   //Get the Port Write Register
-   regPortWrite_ptr = (uint8_t*) GPIO_WriteRegister_LU[PortPin]; 
-   
-    
-    //If PIN is to be set HIGH
-    if (PinLevel == HIGH)
+   if (PinLevel == HIGH) //If PIN is to be set HIGH
     {
-        //Set the bit in the Latch Register with OR
-        *regPortWrite_ptr |= pinBitMask;        
-    }
-    //Everything else - LOW
-    else
-    {      
-       //Invert the Mask - Clear the bit in the Latch Register with AND
-       *regPortWrite_ptr &= ~pinBitMask;         
+       *(GPIO_Register_LU[PortPin].write_reg) |= (GPIO_Register_LU[PortPin].pinmask);  //Set the bit in the Latch Register with OR
+    }    
+   else //Everything else set- LOW
+    {
+       *(GPIO_Register_LU[PortPin].write_reg) &= ~(GPIO_Register_LU[PortPin].pinmask);  //Invert the Mask - Clear the bit in the Latch Register with AND       
     }  
 }
 
@@ -321,24 +279,8 @@ void GPIO_WritePortPin (GPIO_Ports_t PortPin, LogicEnum_t PinLevel)
 *******************************************************************************/
 
 LogicEnum_t GPIO_ReadPortPin(GPIO_Ports_t PortPin)
-{        
-   //var that holds the registers of the Port Read and PIN BitMask.
-   uint8_t *regPortRead_ptr, pinBitMask;
-   
-   //Get the BitMask of the PIN    
-   pinBitMask = GPIO_PinBitMask_LU[PortPin];
-   
-   //Get the Port Write Register
-   regPortRead_ptr = (uint8_t*) GPIO_ReadRegister_LU[PortPin];
-    
-   if ((*regPortRead_ptr & pinBitMask) >> 0x00)
-   {
-       return HIGH;
-   }
-   else
-   {
-       return LOW;
-   }   
+{     
+   return (*(GPIO_Register_LU[PortPin].read_reg) & (GPIO_Register_LU[PortPin].pinmask)) ? HIGH : LOW;   
 }
 
 /******************************************************************************
@@ -379,18 +321,8 @@ LogicEnum_t GPIO_ReadPortPin(GPIO_Ports_t PortPin)
 * <hr>
 *******************************************************************************/
 void GPIO_TogglePortPin(GPIO_Ports_t PortPin)
-{
-    //var that holds the registers of the Port Write and PIN BitMask.
-   uint8_t *regPortWrite_ptr, pinBitMask;
-    
-   //Get the BitMask of the PIN    
-   pinBitMask = GPIO_PinBitMask_LU[PortPin]; 
-   
-   //Get the Port Write Register
-   regPortWrite_ptr = (uint8_t*) GPIO_WriteRegister_LU[PortPin];
-   
-   //Flip the Bit with XOR
-    *regPortWrite_ptr ^= pinBitMask;    
+{    
+   *(GPIO_Register_LU[PortPin].write_reg) ^= (GPIO_Register_LU[PortPin].pinmask);    //Flip the Bit with XOR
 }
 
 

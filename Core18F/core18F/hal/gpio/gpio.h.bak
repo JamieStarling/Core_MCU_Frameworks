@@ -5,7 +5,7 @@
 * Origin Date           :   2024/04/25
 * Version               :   1.0.0
 * Compiler              :   XC8
-* Target                :   Microchip PIC16F series
+* Target                :   Microchip PIC18F series
 * Copyright             :   © 2024 Jamie Starling
 * All Rights Reserved
 *
@@ -30,7 +30,7 @@
 *******************************************************************************/
 
 /*************** TODO *********************************************************
- * * 
+ *
  * 
  * 
 *****************************************************************************/
@@ -49,6 +49,25 @@
 ***** Includes
 *******************************************************************************/
 #include "../../core18F.h"
+
+
+/******************************************************************************
+***** GPIO Interface
+*******************************************************************************/
+typedef struct {
+  void (*ModeSet)(GPIO_Ports_t PortPin, PinDirectionEnum_t PinDirection);   
+  void (*PinWrite)(GPIO_Ports_t PortPin, LogicEnum_t PinLevel);
+  void (*PinToggle)(GPIO_Ports_t PortPin);
+  LogicEnum_t (*PinRead)(GPIO_Ports_t PortPin);
+  
+    #ifdef _CORE16F_HAL_GPIO_CONFIG_ENABLE
+    void (*Configure)(const GPIO_Config_t* Config);
+    #endif
+
+}GPIO_Interface_t;
+
+extern const GPIO_Interface_t GPIO;
+
 
 /******************************************************************************
 ***** Function Prototypes

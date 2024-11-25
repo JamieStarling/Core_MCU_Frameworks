@@ -29,14 +29,6 @@
 *                           for details 
 *******************************************************************************/
 
-/*************** TODO *********************************************************
- * General Code Cleanup
- * Function Documentation
- * Add Change Resolution
- * Handle Different Resolution Conversions
- * 
-*****************************************************************************/
-
 
 /***************  CHANGE LIST *************************************************
 *
@@ -46,13 +38,22 @@
 *
 *****************************************************************************/
 
-#ifndef CORE16F_DS18B20_H
-#define CORE16F_DS18B20_H
+#ifndef _COREMCU_DS18B20_H
+#define _COREMCU_DS18B20_H
 
 /******************************************************************************
 * Includes
 *******************************************************************************/
+#include "../../core_version.h"
+
+#ifdef _CORE16_MCU
 #include "../../core16F.h"
+#endif
+
+#ifdef _CORE18_MCU
+#include "../../core18F.h"
+#endif
+
 
 /******************************************************************************
 * Constants
@@ -99,11 +100,13 @@ typedef enum
 ***** DS18B20 Interface
 *******************************************************************************/
 typedef struct {
-  uint8_t (*Initialize)(void);   
-  float (*Read)(void);
+  DS18B20_StatusEnum_t (*Initialize)(void);   
+  float (*ReadC)(void);
+  float (*ReadF)(void);
   int16_t (*ReadRaw)(void);
   bool (*Present)(void);
   DS18B20_StatusEnum_t(*GetResolution)(void);
+  DS18B20_StatusEnum_t(*Start_Conversion)(void);
 }DS18B20_Interface_t;
 
 extern const DS18B20_Interface_t DS18B20;
@@ -114,13 +117,14 @@ extern const DS18B20_Interface_t DS18B20;
 /******************************************************************************
 * Function Prototypes
 *******************************************************************************/
-uint8_t DS18B20_Init(void);
-uint8_t DS18B20_Read_Temperature(void);
-bool DS18B20_Present(void);
+DS18B20_StatusEnum_t DS18B20_Init(void);
+DS18B20_StatusEnum_t DS18B20_Read_Temperature(void);
+bool DS18B20_PresentStatus(void);
 float DS18B20_Get_TemperatureC(void);
+float DS18B20_Get_TemperatureF(void);
 int16_t DS18B20_Get_TemperatureRAW(void);
 DS18B20_StatusEnum_t DS18B20_Return_Resolution(void);
 
-#endif /*CORE16F_DS18B20_H*/
+#endif /*_COREMCU_DS18B20_H*/
 
 /*** End of File **************************************************************/

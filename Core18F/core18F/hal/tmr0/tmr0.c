@@ -1,5 +1,5 @@
 /****************************************************************************
-* Title                 :   CORE8 Framework : TMR0 for 16F devices
+* Title                 :   CORE MCU Framework : TMR0 for 18F devices
 * Filename              :   tmr0.c
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/30
@@ -328,7 +328,7 @@ uint8_t TMR0_Get_8bit_Value(void)
 *******************************************************************************/
 uint16_t TMR0_Get_16bit_Value(void)
 {
-  return CORE18F_Make_16(TMR0H,TMR0L);
+  return CORE.Make16(TMR0H,TMR0L);
 }
 
 /******************************************************************************

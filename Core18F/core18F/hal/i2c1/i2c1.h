@@ -3,9 +3,9 @@
 * Filename              :   i2c.h
 * Author                :   Jamie Starling
 * Origin Date           :   2024/08/15
-* Version               :   1.0.0
+* Version               :   1.0.3
 * Compiler              :   XC8
-* Target                :   Microchip PIC16F series
+* Target                :   Microchip PIC18F series
 * Copyright             :   © 2024 Jamie Starling
 * All Rights Reserved
 *
@@ -29,18 +29,11 @@
 *                           for details 
 *******************************************************************************/
 
-/*************** TODO *********************************************************
- * * 
- * 
- * 
-*****************************************************************************/
-
 /***************  CHANGE LIST *************************************************
 *
 *   Date        Version     Author          Description 
 *   2024/08/15  1.0.0       Jamie Starling  Initial Version
 *  
-*
 *****************************************************************************/
 
 #ifndef _CORE18F_I2C_H
@@ -53,50 +46,45 @@
 /******************************************************************************
 ****** Configuration
 *******************************************************************************/
+#define _I2C1_BUS_TIMEOUT_VALUE 250
+#define _I2C1_RESET_DELAY_MS 25
 
 /******************************************************************************
- * \brief I2C Return Codes
- * 
- ******************************************************************************/
+* I2C Return Codes
+******************************************************************************/
 typedef enum
-{
- I2C_OK,
- I2C_ADDRESS_VALID_WRITE,
- I2C_ADDRESS_VALID_READ,
- I2C_ADDRESS_INVALID,
- I2C_ACK_RECEIVED,
- I2C_NO_ACK_RECEIVED,
- I2C_TIMEOUT,
-}I2C_Status_Enum_t;
+{    
+    I2C_ADDRESS_INVALID,
+    I2C_NACK_RECEIVED,
+    I2C_ACK_RECEIVED,
+    I2C_TIMEOUT,
+    I2C_OK,
+    I2C_Busy
+}I2C1_Status_Enum_t;
 
-typedef enum
-{
-  I2C_SEND_START_BIT,
-  I2C_SEND_ADDRESS,
-  I2C_SEND_DATA,
-  I2C_READ_DATA,
-  I2C_SEND_STOP_BIT 
-}I2C_Send_State_Enum_t;
 
-typedef enum
-{
-  I2C_ADDRESS_WRITE_MODE = 0,
-  I2C_ADDRESS_READ_MODE = 1  
-}I2C_Address_Mode_Enum_t;
+/******************************************************************************
+***** I2C1 Interface
+*******************************************************************************/
+typedef struct {
+  void (*Initialize)(void);
+  void (*BusReset)(void); 
+  I2C1_Status_Enum_t (*WriteData)(uint8_t i2c_address,uint8_t i2c_bytecount, uint8_t *datablock);
+  I2C1_Status_Enum_t (*ReadData) (uint8_t i2c_address,uint8_t i2c_bytecount_send, uint8_t *datablock_send, uint8_t i2c_bytecount_receive, uint8_t *datablock_receive);
+}I2C1_Master_Interface_t;
+
+extern const I2C1_Master_Interface_t I2C1_MASTER;
 
 
 /******************************************************************************
 * Function Prototypes
 *******************************************************************************/
 void MASTER_I2C1_Init(void);
-void MASTER_I2C1_Send_Start_Bit_BLOCKING(void);
-I2C_Status_Enum_t MASTER_I2C1_Send_Address_BLOCKING(uint8_t address, I2C_Address_Mode_Enum_t address_mode);
-void MASTER_I2C1_Send_Stop_BLOCKING(void);
-I2C_Status_Enum_t MASTER_I2C1_Send_Byte_BLOCKING(uint8_t data);
-I2C_Status_Enum_t MASTER_I2C1_Send_DataBlock_BLOCKING(uint8_t *datablock, uint8_t data_length);
-uint8_t MASTER_I2C1_Receive_Byte_BLOCKING(void);
-I2C_Status_Enum_t MASTER_I2C1_Receive_DataBlock_BLOCKING(uint8_t *datablock, uint8_t data_length);
-void MASTER_I2C1_Test_BLOCKING(void);
+void MASTER_I2C1_Reset(void);
+I2C1_Status_Enum_t MASTER_I2C1_WriteData(uint8_t i2c_address,uint8_t i2c_bytecount, uint8_t *datablock);
+I2C1_Status_Enum_t MASTER_I2C1_ReadData(uint8_t i2c_address,uint8_t i2c_bytecount_send, uint8_t *datablock_send, uint8_t i2c_bytecount_receive, uint8_t *datablock_receive);
+
+
 
 
 

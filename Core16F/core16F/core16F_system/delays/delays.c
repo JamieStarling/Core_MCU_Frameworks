@@ -29,13 +29,6 @@
 *                           for details 
 *******************************************************************************/
 
-/*************** TODO *********************************************************
- * 
- * 
- * 
-*****************************************************************************/
-
-
 /***************  CHANGE LIST *************************************************
 *
 *   Date        Version     Author          Description 
@@ -56,38 +49,22 @@
 *******************************************************************************/
 /******************************************************************************
 * Function : CORE16F_Delay_BlockingMS()
-*//** 
-* \b Description:
+* Description:
 *
-* Generates a blocking delay for a specified time in milliseconds.
-* This function blocks the program execution for the given number of milliseconds.
-* It is primarily used for implementing time delays in the Core8 system.
+* This function generates a blocking delay for a specified duration in milliseconds.
+* It continuously checks the elapsed time using ISR_CORE16F_SYSTEM_TIMER_GetMillis()
+* and blocks the program until the delay period has passed.
 *  
-* PRE-CONDITION: The system timer must be enabled and properly initialized. 
-* PRE-CONDITION: _CORE16F_SYSTEM_TIMER_ENABLE should be set in core16F.h
+* Parameters:
+* - timeMS (uint32_t): The desired delay time in milliseconds.
+*  If less than _CORE16F_MIN_DELAY_VALUE, the function sets it to the minimum delay value.
 *
-* POST-CONDITION: Program execution is delayed by the specified time.
-*
-* @param[in] : timeMS  The delay time in milliseconds. 	
-*
-* @return : void. This function does not return a value.		
-*
-* \b Example:
-* @code
-* 	
-* CORE16F_Delay_BlockingMS(1000);  //Performs a 1000Ms Delay or 1 second.
-* 	
-* @endcode
-*
-* 
-*
-* <br><b> - HISTORY OF CHANGES - </b>
+*  - HISTORY OF CHANGES - 
 *  1.0.2 Updated function to check for input value if less than Min Delay - Set to min delay value
-* <hr>
+* 
 *******************************************************************************/
 void CORE16F_Delay_BlockingMS(uint32_t timeMS)
-{
-  
+{  
   if (timeMS < _CORE16F_MIN_DELAY_VALUE){timeMS = _CORE16F_MIN_DELAY_VALUE;}
   
   // Store the current time in milliseconds  

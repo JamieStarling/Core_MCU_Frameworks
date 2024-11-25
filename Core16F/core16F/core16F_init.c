@@ -1,6 +1,6 @@
 /****************************************************************************
-* Title                 :   Core8 System Init Functions
-* Filename              :   core16_init.c
+* Title                 :   Core16F System Init Functions
+* Filename              :   core16F_init.c
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/25
 * Version               :   1.0.1
@@ -29,12 +29,6 @@
 *                           for details 
 *******************************************************************************/
 
-/*************** TODO *********************************************************
- * 
- * 
- * 
-*****************************************************************************/
-
 /***************  CHANGE LIST *************************************************
 *
 *   Date        Version     Author          Description 
@@ -53,9 +47,25 @@
 *******************************************************************************/
 const CORE16F_System_Interface_t CORE = {
     .Initialize = &CORE16F_init,
+    
     #ifdef _CORE16F_SYSTEM_INCLUDE_DELAYS_ENABLE
-    .Delay_MS = &CORE16F_Delay_BlockingMS
+        .Delay_MS = &CORE16F_Delay_BlockingMS,
     #endif /*_CORE16F_SYSTEM_INCLUDE_DELAYS_ENABLE*/
+    
+    #ifdef _CORE16F_SYSTEM_EVENTS_ENABLE
+        .Events_Initialize = &TimedEventSystem_Init,
+        .Events_Add = &ScheduleEvent,
+        .Events_Check = &CheckEvents,
+        .Events_Remove = &CancelEvent,
+    #endif
+
+    .Make16 = &CORE_Make_16,
+    .Low4 = &CORE_Return_4bit_Low,
+    .High4 = &CORE_Return_4bit_High,
+    .Set_Bit = &CORE_Set_Bit,
+    .Clear_Bit = &CORE_Clear_Bit,
+    .FloatToString =&CORE_floatToString,
+    .IntToString = &CORE_intToString,
 };
 
 /******************************************************************************
@@ -63,32 +73,19 @@ const CORE16F_System_Interface_t CORE = {
 *******************************************************************************/
 /******************************************************************************
 * Function : CORE16F_init()
-*//*
-* \b Description:
-*
-* Initializes the Core8 system for the PIC16F series microcontrollers.
-* If the system timer is enabled (via _CORE16F_SYSTEM_TIMER_ENABLE), 
-* this function will initialize the system timer by calling ISR_CORE16F_SYSTEM_TIMER_Init()
+* Description: Initializes the Core16F system for PIC16F MCUs, setting up timers and 
+* events if they are enabled in the configuration.
 * 
-* \b Example:
-* @code
-* 
-* In your main.c file:* 
-* CORE16F_init(); // Initialize Core8 system, including the system timer if enabled
-* 	
-* @endcode
-*
-* 
-*
-* <br><b> - HISTORY OF CHANGES - </b>
-*  
-* <hr>
 *******************************************************************************/
 void CORE16F_init(void)
 {
     #ifdef _CORE16F_SYSTEM_TIMER_ENABLE
-    ISR_CORE16F_SYSTEM_TIMER_Init();
-    #endif
+        ISR_CORE16F_SYSTEM_TIMER_Init();    // Initializes Timer ISR for system timing
+    
+    #ifdef _CORE16F_SYSTEM_EVENTS_ENABLE
+        CORE.Events_Initialize();        // Initializes Core 16F Event System
+    #endif //_CORE16F_SYSTEM_EVENTS_ENABLE
+    #endif //_CORE16F_SYSTEM_TIMER_ENABLE
 }
 
 /*** End of File **************************************************************/

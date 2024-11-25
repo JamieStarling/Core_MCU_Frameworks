@@ -1,11 +1,11 @@
 /****************************************************************************
-* Title                 :   Core8 Framework Generic Utilities
+* Title                 :   Core MCU Framework Generic Utilities
 * Filename              :   utils.h
 * Author                :   Jamie Starling
 * Origin Date           :   2024/08/15
-* Version               :   1.0.0
+* Version               :   1.0.2
 * Compiler              :   XC8
-* Target                :   Microchip PIC16F series
+* Target                :   Microchip PIC18F series
 * Copyright             :   © 2024 Jamie Starling
 * All Rights Reserved
 *
@@ -29,31 +29,31 @@
 *                           for details 
 *******************************************************************************/
 
-/*************** TODO *********************************************************
- * * 
- * 
- * 
-*****************************************************************************/
-
 /***************  CHANGE LIST *************************************************
 *
 *   Date        Version     Author          Description 
 *   2024/08/15  1.0.0       Jamie Starling  Initial Version
 *  
-*
 *****************************************************************************/
 
-#ifndef _CORE18F_SYSTEM_UTILS_H
-#define _CORE18F_SYSTEM_UTILS_H
+#ifndef _CORE_SYSTEM_UTILS_H
+#define _CORE_SYSTEM_UTILS_H
 /******************************************************************************
 * Includes
 *******************************************************************************/
 #include "../../core18F.h"
 
+
 /******************************************************************************
 * Function Prototypes
 *******************************************************************************/
-uint16_t CORE18F_Make_16(uint8_t high_byte, uint8_t low_byte);
+uint16_t CORE_Make_16(uint8_t high_byte, uint8_t low_byte);
+uint8_t CORE_Return_4bit_High(uint8_t byte);
+uint8_t CORE_Return_4bit_Low(uint8_t byte);
+uint8_t CORE_Set_Bit(uint8_t byte, uint8_t bit_position);
+uint8_t CORE_Clear_Bit(uint8_t byte, uint8_t bit_position);
+void CORE_floatToString(float number, char* buffer, uint8_t decimalPlaces);
+void CORE_intToString(int32_t number, char* buffer);
 
-#endif /*_CORE18F_SYSTEM_UTILS_H*/
+#endif /*_CORE_SYSTEM_UTILS_H*/
 /*** End of File **************************************************************/

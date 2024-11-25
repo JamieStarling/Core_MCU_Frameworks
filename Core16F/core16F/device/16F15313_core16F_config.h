@@ -29,18 +29,12 @@
 *                           for details 
 *******************************************************************************/
 
-/*************** TODO *********************************************************
- * * 
- * 
- * 
-*****************************************************************************/
 
 /***************  CHANGE LIST *************************************************
 *
 *   Date        Version     Author          Description 
 *   2024/04/25  1.0.0       Jamie Starling  Initial Version
 *  
-*
 *****************************************************************************/
 
 #ifndef _CORE16F_16F15313_CONFIG_H
@@ -53,103 +47,51 @@
 /******************************************************************************
 * Configuration for ISR
 *******************************************************************************/
-#define _CORE16F_ENABLE_PERIPHERAL_INTERRUPT TRUE
+#define _CORE16F_ENABLE_PERIPHERAL_INTERRUPT 
 
 /******************************************************************************
 ************* Configuration - Enable Disables MCU HAL and Features
 *******************************************************************************/
 
-/******************************************************************************
-*************Configuration - Core MCU Framework HAL Enable
-*******************************************************************************/
+/*GPIO and Analog*/
+//#define _CORE16F_HAL_GPIO_CONFIG_ENABLE  //Enabled GPIO to Be Set Through Lookup Table
+//#define _CORE16F_HAL_GPIO_ANALOG_ENABLE  //Enable Analog Features
 
-/******************************************************************************
-* Enable GPIO Config - GPIO_Init* 
-*******************************************************************************/
-//#define _CORE16F_HAL_GPIO_CONFIG_ENABLE
+/*Timer Functions*/
+//#define _CORE16F_HAL_TMR0_ENABLE  //System Timer Uses TMR0 - Don't need to enable if using the system timer
+//#define _CORE16F_HAL_TMR1_ENABLE  //Enables TMR1
+//#define _CORE16F_HAL_TMR2_ENABLE  //If using PWM TMR2 is automatically enabled.
 
-/******************************************************************************
-* Enable HAL TMR0 Functions
-* System Timer Uses TMR0 - Don't need to enable if using the system timer
-*******************************************************************************/
-//#define _CORE16F_HAL_TMR0_ENABLE
+/*SERIAL1 Functions*/
+//#define _CORE16F_HAL_SERIAL1_ENABLE
+//#define _CORE16F_HAL_SERIAL1_ISR_ENABLE   //Enables Serial1 with interrupt support.
 
-/******************************************************************************
-* Enable HAL TMR1 Functions
-*******************************************************************************/
-//#define _CORE16F_HAL_TMR1_ENABLE
+/*PWM*/
+//#define _CORE16F_HAL_PWM_ENABLE   //Enable PWM Features
+//#define _CORE16F_HAL_PWM3_ENABLE  //Enable PWM3 
+//#define _CORE16F_HAL_PWM4_ENABLE  //Enable PWM4
+//#define _CORE16F_HAL_PWM5_ENABLE  //Enable PWM5
+//#define _CORE16F_HAL_PWM6_ENABLE  //Enable PWM6
 
-/******************************************************************************
-* Enable HAL TMR2 Functions
-* If using PWM TMR2 is automatically enabled. 
-*******************************************************************************/
-//#define _CORE16F_HAL_TMR2_ENABLE
-
-/******************************************************************************
-* Enable HAL - GPIO Analog Functions
-*******************************************************************************/
-#define _CORE16F_HAL_GPIO_ANALOG_ENABLE
-
-/******************************************************************************
-* Enable Core8 - SERIAL1 Functions
-* Provides support for the Enhanced Universal Synchronous Asynchronous Receiver Transmitter (SERIAL1)
-* for serial communication.
-*******************************************************************************/
-#define _CORE16F_HAL_SERIAL1_ENABLE
-//#define _CORE16F_HAL_SERIAL1_ISR_ENABLE
-
-/******************************************************************************
-* Enable HAL - PWM3 Functions
-*******************************************************************************/
-#define _CORE16F_HAL_PWM3_ENABLE
-
-/******************************************************************************
-* Enable HAL - PWM4 Functions
-*******************************************************************************/
-//#define _CORE16F_HAL_PWM4_ENABLE
-
-/******************************************************************************
-* Enable HAL - PWM5 Functions
-*******************************************************************************/
-//#define _CORE16F_HAL_PWM5_ENABLE
-
-/******************************************************************************
-* Enable HAL - PWM6 Functions
-*******************************************************************************/
-//#define _CORE16F_HAL_PWM6_ENABLE
-
-/******************************************************************************
-* Enable HAL - I2C Functions
-*******************************************************************************/
+/*I2C*/
 //#define _CORE16F_HAL_I2C_ENABLE
 
-/******************************************************************************
-* Enable HAL - One Wire Functions
-*******************************************************************************/
+/*One Wire*/
 //#define _CORE16F_HAL_ONE_WIRE_ENABLE
 
-/******************************************************************************
-* Configuration for One Wire
-*******************************************************************************/
-/*PORTA.0*/
-#ifdef _CORE16F_HAL_ONE_WIRE_ENABLE
-#define OW_DIRECTION_REGISTER TRISAbits.TRISA0
-#define OW_PINDRIVER_REGISTER LATAbits.LATA0
-#define OW_PINREAD_REGISTER PORTAbits.RA0
-#define OW_PINANALOG_REGISTER ANSELAbits.ANSA0
-#endif
+/*NCO1*/
+//#define _CORE16F_HAL_NCO1_ENABLE
 
 /******************************************************************************
-* Configuration for GPIO
+* DEVICE CONFIGUATION TABLES
+*******************************************************************************/
+
+/******************************************************************************
+***** Configuration for GPIO - Used only if Enabled
 *******************************************************************************/
 #ifdef _CORE16F_HAL_GPIO_CONFIG_ENABLE
 
-/******************************************************************************
- * \brief GPIO Configuration Structure
- * 
- * This structure holds the configuration for each GPIO pin, including its pin number,
- * input/output mode, and initial pin level.
- *******************************************************************************/
+/*GPIO Configuration Structure */
 typedef struct
 {
     GPIO_Ports_t PortPin; /** < The I/ O pin*/
@@ -157,12 +99,9 @@ typedef struct
     LogicEnum_t PinLevel; /** < HIGH or LOW*/
 }GPIO_Config_t;
 
+/*GPIO Configuration Table */
+/* PortPin, Mode, Initial PinLevel */
 
-/******************************************************************************
- * \brief GPIO Configuration Table
- * 
- * PortPin, Mode, Initial PinLevel
- *******************************************************************************/
 const GPIO_Config_t GPIO_Config[]=
 {        
     {PORTA_0,OUTPUT,LOW},
@@ -174,16 +113,18 @@ const GPIO_Config_t GPIO_Config[]=
 };
 #endif //_CORE16F_HAL_GPIO_CONFIG_ENABLE
 
+
+
 /******************************************************************************
 ***** Configuration for SERIAL1
 *******************************************************************************/
+
 #ifdef _CORE16F_HAL_SERIAL1_ENABLE
 #define _CORE16F_SERIAL1_INPUT_PIN PORTA_5      //Defines the EUSART Input Pin
 #define _CORE16F_SERIAL1_OUTPUT_PIN PORTA_4     //Defines the EUSART Ouput Pin
 
 /******************************************************************************
- * \brief Baud Rate Selection Enum
- * 
+ * Baud Rate Selection  
  ********************************************************************************/
 typedef enum
 {
@@ -193,8 +134,7 @@ typedef enum
 }SerialBaudEnum_t;
 
 /******************************************************************************
- * \brief SERIAL1 Configuration Structure
- * 
+ * SERIAL1 Configuration Structure
  * This structure defines the settings for the SERIAL1 module, such as baud rate and control options.
  ********************************************************************************/
 typedef struct
@@ -209,8 +149,7 @@ typedef struct
 }SERIAL1_Config_t;
 
 /******************************************************************************
- * \brief SERIAL1 Configuration Lookup Table
- * 
+ * SERIAL1 Configuration Lookup Table
  ********************************************************************************/
 /*Config for 32Mhz*/
 #if _XTAL_FREQ == 32000000
@@ -221,9 +160,7 @@ const SERIAL1_Config_t SERIAL1_Config[]=
     {34,DISABLED,DISABLED,ENABLED,ENABLED,ENABLED,ENABLED}  //57600 Baud @32Mhz
 };
 #endif
-
-#endif //SERIAL1 Config
-
+#endif //_CORE16F_HAL_SERIAL1_ENABLE
 
 
 /******************************************************************************
@@ -231,9 +168,8 @@ const SERIAL1_Config_t SERIAL1_Config[]=
 *******************************************************************************/
 
 /******************************************************************************
- * \brief PWM Enum 
- * 
- ******************************************************************************/
+* PWM LU  
+******************************************************************************/
 typedef enum
 {
     PWM_8bit,
@@ -241,10 +177,9 @@ typedef enum
 }PWM_ConfigEnum_t;
 
 /******************************************************************************
- * \brief PWM Configuration Structure
- * 
+*PWM Configuration Structure
 * This structure defines the settings for PWM, including the period register value and prescale setting.
- ******************************************************************************/
+******************************************************************************/
 typedef struct
 {
     uint8_t PR2_Value; 
@@ -252,8 +187,7 @@ typedef struct
 }PWM_Config_t;
 
 /******************************************************************************
- * \brief PWM Configuration Table
- * 
+* PWM Configuration Table
 * This table defines the settings for PWM, including the period register value and prescale setting.
  ******************************************************************************/
 /*Config for 32Mhz*/
@@ -271,6 +205,21 @@ const PWM_Config_t PWM_Config[]=
 #define I2C1_CLOCK_PIN PORTA_0
 #define I2C1_DATA_PIN PORTA_1
 
+
+/******************************************************************************
+***** Configuration for One Wire
+*******************************************************************************/
+/*PORTA.0*/
+#ifdef _CORE16F_HAL_ONE_WIRE_ENABLE
+#define OW_DIRECTION_REGISTER TRISAbits.TRISA0
+#define OW_PINDRIVER_REGISTER LATAbits.LATA0
+#define OW_PINREAD_REGISTER PORTAbits.RA0
+#define OW_PINANALOG_REGISTER ANSELAbits.ANSA0
+#endif
+
+
 #endif /*_CORE16F_16F1532X_CONFIG_H*/
+
+/*** End of File **************************************************************/
 
 /*** End of File **************************************************************/

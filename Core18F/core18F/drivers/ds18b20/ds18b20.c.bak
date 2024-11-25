@@ -40,7 +40,7 @@
 *
 *    Date    Version   Author         Description 
 *
-*   2024/10/11  1.0.0       Jamie Starling  Initial Version 
+*   2024/10/11  1.0.0   Jamie Starling  Initial Version 
 *******************************************************************************/
 
 /******************************************************************************
@@ -57,6 +57,7 @@ const DS18B20_Interface_t DS18B20 = {
   .Present = &DS18B20_Present,
   .ReadRaw = &DS18B20_Get_TemperatureRAW,
   .GetResolution = &DS18B20_Return_Resolution,
+  .Start_Conversion = &DS18B20_Read_Temperature,
 };
 
 
@@ -65,7 +66,7 @@ const DS18B20_Interface_t DS18B20 = {
 * Variables
 *******************************************************************************/
 typedef struct {
-    uint8_t is_present;
+    bool is_present;
     uint8_t crc_fail_count;
     uint8_t family_code;
     uint8_t serial_number[6];
@@ -127,23 +128,23 @@ void DS18B20_Update_ScratchPad_Status(uint8_t *ds_data);
 bool DS18B20_Check_Present(void)
 {  
   bool device_status;
-  device_status = ONE_WIRE.Reset();
+  device_status = ONE_WIRE.SendReset();  
   if (device_status == DEVICE_PRESENT){return true;}
  else{return false;}    
 }
 
 /*DS18B20_Init*/
-uint8_t DS18B20_Init(void)
+DS18B20_StatusEnum_t DS18B20_Init(void)
 {
   uint8_t receivedCRC;
   uint8_t computed_crc_value;
   uint8_t ds_data[_DS18B20_ROM_SIZE];
   
-  ONE_WIRE_Init();
+  ONE_WIRE.Initialize();
   __delay_us(20);
   
   if (DS18B20_Check_Present()){
-      DS18B20_Status.is_present = TRUE;
+      DS18B20_Status.is_present = true;
       DS18B20_Read_ROM(ds_data, &receivedCRC);
       
       computed_crc_value = DS18B20_Compute_CRC(ds_data, sizeof(ds_data));
@@ -153,6 +154,7 @@ uint8_t DS18B20_Init(void)
             DS18B20_Update_Status(ds_data);
             return DS18B20_STATUS_OK;
         }
+      
       /*If CRC check failed, Handle Failed Event*/
       else {
             DS18B20_Handle_CRC_Fail();
@@ -161,7 +163,7 @@ uint8_t DS18B20_Init(void)
     }/*End of If DS Present Logic*/
   
   /*If DS is not present we fail and send back no_device*/  
-    DS18B20_Status.is_present = FALSE;
+    DS18B20_Status.is_present = false;
     return DS18B20_STATUS_NO_DEVICE;   
 }
 
@@ -213,8 +215,8 @@ uint8_t DS18B20_Compute_CRC(uint8_t *data, uint8_t len)
     return computed_crc;  
 }
 
-/*DS18B20_Read_Temperature*/
-uint8_t DS18B20_Read_Temperature(void)
+/*DS18B20_Read_Temperature - Start Conversion*/
+DS18B20_StatusEnum_t DS18B20_Read_Temperature(void)
 {             
     // Start the conversion process
     if (!DS18B20_Start_Conversion()) {

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Title                 :   CORE8 Framework : TMR0 for 16F devices
+* Title                 :   CORE MCU Framework : TMR0 for 16F devices
 * Filename              :   tmr0.c
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/30
@@ -28,12 +28,6 @@
 *                Visit http://jamiestarling.com/corelicense
 *                           for details 
 *******************************************************************************/
-
-/*************** TODO *********************************************************
- * 
- * 
- * 
-*****************************************************************************/
 
 /***************  CHANGE LIST *************************************************
 *
@@ -71,360 +65,145 @@ const TMR0_Interface_t TIMER0 = {
 *******************************************************************************/
 /******************************************************************************
 * Function : TMR0_Enable()
- * 
-* \b Description:
+* Description: Enables or disables the TMR0 module based on the input parameter.
 *
-* Enables or disables the TMR0 module.
-*  
-* PRE-CONDITION: _CORE16F_HAL_TMR0_ENABLE in core16F.h is defined  
+* Parameters:
+*   - setState (LogicEnum_t): ENABLED to enable TMR0, DISABLED to disable it.
 *
-* POST-CONDITION: TMR0 is either Disabled or Enabled Based on Parm
-*
-* @param[in] : LogicEnum_t values : ENABLED/DISABLED
-*
-* @return : None		
-*
-* \b Example:
-* @code
-* TMR0_Enable(ENABLED); //Enable TMR0
-* TMR0_Enable(DISABLED); //Disable TMR0
-* 	
-* @endcode
-*
-* 
-*
-* <br><b> - HISTORY OF CHANGES - </b>
-*  
-* <hr>
 *******************************************************************************/
 void TMR0_Enable(LogicEnum_t setState)
 {
-    T0CON0bits.T0EN = setState;
+    T0CON0bits.T0EN = setState; // Set TMR0 enable/disable bit
 }
 
 /******************************************************************************
 * Function : TMR0_Set_16bit_Mode()
- * 
-* \b Description:
+* Description: Enables or disables 16-bit mode for the TMR0 module.
 *
-* Enables or Disables TMR0 16bit mode
-*  
-* PRE-CONDITION: _CORE16F_HAL_TMR0_ENABLE in core16F.h is defined  
+* Parameters:
+*   - setState (LogicEnum_t): ENABLED to enable 16-bit mode, DISABLED to disable it.
 *
-* POST-CONDITION: TMR0 16bit mode is either Disabled or Enabled Based on Parm
-*
-* @param[in] : LogicEnum_t values : ENABLED/DISABLED
-*
-* @return : None		
-*
-* \b Example:
-* @code
-* TMR0_Set_16bit_Mode(ENABLED); //Enable TMR0 16bit mode
-* TMR0_Set_16bit_Mode(DISABLED); //Disable TMR0 16bit mode
-* 	
-* @endcode
-*
-* 
-*
-* <br><b> - HISTORY OF CHANGES - </b>
-*  
-* <hr>
 *******************************************************************************/
 void TMR0_Set_16bit_Mode(LogicEnum_t setState)
 {
-    T0CON0bits.T016BIT = setState;
+    T0CON0bits.T016BIT = setState; // Set TMR0 16-bit mode based on the parameter
 }
 
 /******************************************************************************
 * Function : TMR0_Set_Output_Postscaler()
- * 
-* \b Description:
+* Description: Sets the postscaler value for the TMR0 module.
 *
-* Sets the Postscaler Value for TMR0
-*  
-* PRE-CONDITION: _CORE16F_HAL_TMR0_ENABLE in core16F.h is defined  
+* Parameters:
+*   - value (TMR0_PostScaler_SelectEnum_t): The postscaler value to set (refer to device lookup table).
 *
-* POST-CONDITION: TMR0 Postscaler Value is set Based on Parm
-*
-* @param[in] : TMR0_PostScaler_SelectEnum_t values : See device lookup table
-*
-* @return : None		
-*
-* \b Example:
-* @code
-* TMR0_Set_Output_Postscaler(TMR0_POST_SCALE_1_1); //Set TMR0 Postscale to 1:1
-* TMR0_Set_Output_Postscaler(TMR0_POST_SCALE_1_8); //Set TMR0 Postscale to 1:8
-* 	
-* @endcode
-*
-* 
-*
-* <br><b> - HISTORY OF CHANGES - </b>
-*  
-* <hr>
 *******************************************************************************/
 void TMR0_Set_Output_Postscaler(TMR0_PostScaler_SelectEnum_t value)
 {  
-  T0CON0bits.T0OUTPS = value;
+  T0CON0bits.T0OUTPS = value; // Set the TMR0 postscaler
 }
 
 /******************************************************************************
 * Function : TMR0_Set_Clock_Source()
- * 
-* \b Description:
+* Description: Sets the clock source for the TMR0 module.
 *
-* Sets the Clock Source for TMR0
-*  
-* PRE-CONDITION: _CORE16F_HAL_TMR0_ENABLE in core16F.h is defined  
+* Parameters:
+*   - value (TMR0_Clock_Source_SelectEnum_t): The clock source to set (refer to device lookup table).
 *
-* POST-CONDITION: TMR0 ClockSource Value is set Based on Parm
-*
-* @param[in] : TMR0_Clock_Source_SelectEnum_t values : See device lookup table
-*
-* @return : None		
-*
-* \b Example:
-* @code
-* TMR0_Set_Clock_Source(TMR0_FOSC_D4); //Set TMR0 Clock Source to FOSC/4
-* TMR0_Set_Clock_Source(TMR0_HFINTOSC); //Set TMR0 Clock Source to High Speed Internal OSC
-* 	
-* @endcode
-*
-* 
-*
-* <br><b> - HISTORY OF CHANGES - </b>
-*  
-* <hr>
 *******************************************************************************/
 void TMR0_Set_Clock_Source(TMR0_Clock_Source_SelectEnum_t value)
 {
-  T0CON1bits.T0CS = value;
+    T0CON1bits.T0CS = value; // Set the TMR0 clock source
 }
 
 /******************************************************************************
 * Function :  TMR0_Set_Input_Async_Mode()
- * 
-* \b Description:
+* Description: Enables or disables the asynchronous mode for TMR0.
 *
-* Enables or Disables TMR0 Async Mode
-*  
-* PRE-CONDITION: _CORE16F_HAL_TMR0_ENABLE in core16F.h is defined  
+* Parameters:
+*   - setState (LogicEnum_t): ENABLED to enable async mode, DISABLED to disable it.
 *
-* POST-CONDITION: TMR0 Async Mode mode is either Disabled or Enabled Based on Parm
-*
-* @param[in] : LogicEnum_t values : ENABLED/DISABLED
-*
-* @return : None		
-*
-* \b Example:
-* @code
-* TMR0_Set_Input_Async_Mode(ENABLED); //Enable TMR0 Async Mode
-* TMR0_Set_Input_Async_Mode(DISABLED); //Disable TMR0 Async Mode
-* 	
-* @endcode
-*
-* 
-*
-* <br><b> - HISTORY OF CHANGES - </b>
-*  
-* <hr>
 *******************************************************************************/
 void TMR0_Set_Input_Async_Mode(LogicEnum_t setState)
 {
-    T0CON1bits.T0ASYNC = setState;
+    T0CON1bits.T0ASYNC = setState; // Set TMR0 async mode based on the parameter
 }
 
 /******************************************************************************
 * Function : TMR0_Set_Prescaler_Rate()
- * 
-* \b Description:
+* Description: Sets the prescaler value for the TMR0 module.
 *
-* Sets the Prescaler Value for TMR0
-*  
-* PRE-CONDITION: _CORE16F_HAL_TMR0_ENABLE in core16F.h is defined  
+* Parameters:
+*   - value (TMR0_PreScaler_SelectEnum_t): The prescaler value to set (refer to device lookup table).
 *
-* POST-CONDITION: TMR0 Prescaler Value is set Based on Parm
-*
-* @param[in] : TMR0_PreScaler_SelectEnum_t values : See device lookup table
-*
-* @return : None		
-*
-* \b Example:
-* @code
-* TMR0_Set_Prescaler_Rate(PRESCALER_1_1); //Set TMR0 Prescale to 1:1
-* TMR0_Set_Prescaler_Rate(PRESCALER_1_64); //Set TMR0 Prescale to 1:64
-* 	
-* @endcode
-*
-* 
-*
-* <br><b> - HISTORY OF CHANGES - </b>
-*  
-* <hr>
 *******************************************************************************/
 void TMR0_Set_Prescaler_Rate(TMR0_PreScaler_SelectEnum_t value)
 {
-  T0CON1bits.T0CKPS = value;
+  T0CON1bits.T0CKPS = value; // Set the TMR0 prescaler value
 }
 
 /******************************************************************************
 * Function :  TMR0_Get_8bit_Value()
- * 
-* \b Description:
+* Description: Returns the current 8-bit value of the TMR0L register.
 *
-* Returns TMR0 8bit value from TMR0L Register.
-*  
-* PRE-CONDITION: _CORE16F_HAL_TMR0_ENABLE in core16F.h is defined  
+* Returns:
+*   - uint8_t: The value of the TMR0L register.
 *
-* POST-CONDITION: 
-*
-* @param[in] : none
-*
-* @return : uint8_t value of TMR0L Register. 		
-*
-* \b Example:
-* @code
-* uint8_t var = TMR0_Get_8bit_Value(); 
-*  	
-* @endcode
-*
-* 
-*
-* <br><b> - HISTORY OF CHANGES - </b>
-*  
-* <hr>
 *******************************************************************************/
 uint8_t TMR0_Get_8bit_Value(void)
 {
-  return TMR0L;
+    return TMR0L; // Return the 8-bit value of the TMR0L register
 }
 
 /******************************************************************************
 * Function :  TMR0_Get_16bit_Value()
- * 
-* \b Description:
+* Description: Returns the current 16-bit value of TMR0 by combining the TMR0H and TMR0L registers.
 *
-* Returns TMR0 16bit value from combining TMR0H and TMR0L Register.
-*  
-* PRE-CONDITION: _CORE16F_HAL_TMR0_ENABLE in core16F.h is defined  
+* Parameters:
+*   - None
 *
-* POST-CONDITION: 
-*
-* @param[in] : none
-*
-* @return : 16bit value from combining TMR0H and TMR0L Register. 		
-*
-* \b Example:
-* @code
-* uint16_t var = TMR0_Get_16bit_Value(); 
-*  	
-* @endcode
-*
-* 
-*
-* <br><b> - HISTORY OF CHANGES - </b>
-*  
-* <hr>
+* Returns:
+*   - uint16_t: The combined 16-bit value from TMR0H and TMR0L.
 *******************************************************************************/
 uint16_t TMR0_Get_16bit_Value(void)
 {
-  return CORE16F_Make_16(TMR0H,TMR0L);
+  return CORE.Make16(TMR0H,TMR0L); // Combine TMR0H and TMR0L to return a 16-bit value
 }
 
 /******************************************************************************
 * Function :  TMR0_Clear_Interrupt_Flag()
-* 
-* \b Description:
+* Description: Clears the TMR0 interrupt flag.
 *
-* Clears TMR0 Interrupt Flag
-*  
-* PRE-CONDITION: _CORE16F_HAL_TMR0_ENABLE in core16F.h is defined  
-*
-* POST-CONDITION: TMR0IF is cleared
-*
-* @param[in] : none
-*
-* @return : none		
-*
-* \b Example:
-* @code
-* TMR0_Clear_Interrupt_Flag();
-*  	
-* @endcode
-*
-* 
-*
-* <br><b> - HISTORY OF CHANGES - </b>
-*  
-* <hr>
 *******************************************************************************/
-void TMR0_Clear_Interrupt_Flag(void)        
+inline void TMR0_Clear_Interrupt_Flag(void)        
 {  
   PIR0bits.TMR0IF = 0;
 }
 
 /******************************************************************************
 * Function : TMR0_Enable_Interrupt()
-* 
-* \b Description:
+* Description: Enables or disables the TMR0 interrupt.
 *
-* Enables or Disables TMR0 Interrupt
-*  
-* PRE-CONDITION: _CORE16F_HAL_TMR0_ENABLE in core16F.h is defined  
+* Parameters:
+*   - setState (LogicEnum_t): ENABLED to enable the interrupt, DISABLED to disable it.
 *
-* POST-CONDITION: TMR0 Interrupt is enabled or disabled based on parm.
-*
-* @param[in] : LogicEnum_t values : ENABLED/DISABLED
-*
-* @return : none		
-*
-* \b Example:
-* @code
-* TMR0_Enable_Interrupt(ENABLED);
-* TMR0_Enable_Interrupt(DISABLED);
-*  	
-* @endcode
-*
-* 
-*
-* <br><b> - HISTORY OF CHANGES - </b>
-*  
-* <hr>
 *******************************************************************************/
 void TMR0_Enable_Interrupt(LogicEnum_t setState)
 {
-    PIE0bits.TMR0IE = setState;
+    PIE0bits.TMR0IE = setState; // Set the TMR0 interrupt enable bit based on setState
 }
       
 /******************************************************************************
 * Function : TMR0_Interrupt_Flag_Set()
-* 
-* \b Description:
+* Description: Checks if the TMR0 interrupt flag is set.
 *
-* Returns TRUE if the TMR0 Interrupt Flag is Set.
-*  
-* PRE-CONDITION: _CORE16F_HAL_TMR0_ENABLE in core16F.h is defined  
 *
-* POST-CONDITION: 
+* Returns:
+*   - LogicEnum_t: TRUE if the TMR0 interrupt flag is set, FALSE otherwise.
 *
-* @param[in] : none
 *
-* @return : TRUE/FALSE		
-*
-* \b Example:
-* @code
-* bool status = TMR0_Interrupt_Flag_Set();
-* *  	
-* @endcode
-*
-* 
-*
-* <br><b> - HISTORY OF CHANGES - </b>
-*  
-* <hr>
 *******************************************************************************/
-LogicEnum_t TMR0_Interrupt_Flag_Set(void)
+inline LogicEnum_t TMR0_Interrupt_Flag_Set(void)
 {
-  return PIR0bits.TMR0IF;
+  return PIR0bits.TMR0IF; // Return the state of the TMR0 interrupt flag
 }
 /*** End of File **************************************************************/

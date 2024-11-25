@@ -29,18 +29,11 @@
 *                           for details 
 *******************************************************************************/
 
-/*************** TODO *********************************************************
- * 
- * 
- * 
-*****************************************************************************/
-
 /***************  CHANGE LIST *************************************************
 *
 *   Date        Version     Author          Description 
 *   2024/04/25  1.0.0       Jamie Starling  Initial Version
 *  
-*
 *****************************************************************************/
 
 /******************************************************************************
@@ -53,43 +46,15 @@
 *******************************************************************************/
 /******************************************************************************
 * Function : core16F_isr_routine()
-*//** 
-* \b Description:
+* Description: Main interrupt service routine (ISR) for the Core MCU framework, handling 
+* system interrupts. Processes system timer interrupts and can be expanded 
+* to include additional interrupt handlers as needed.
 *
-* This function serves as the main interrupt service routine (ISR) for the Core8 
-* framework, handling all the system interrupts. It is designed to process different 
-* ISR events, such as system timers, by checking the appropriate interrupt flags 
-* and servicing them accordingly. Custom ISR code can also be added here based on 
-* specific interrupt sources.
-* 
-* The function currently calls the system timer ISR handler (`ISR_CORE16F_SYSTEM_TIMER_ISR`) 
-* when the system timer is enabled. Additional handlers for other interrupts (e.g., 
-* peripheral interrupts) can be added as needed.  
-*
-* **Usage Notes:**
-* - Developers can add custom ISR handling code to process other interrupt events.
-* - It is important to check and clear the corresponding interrupt flags within the ISR 
-*   to avoid retriggering of the same interrupt.
-*  
-* PRE-CONDITION:  Global interrupts must be enabled.
-* PRE-CONDITION:  Interrupt sources, such as timers or peripherals, must be configured and enabled 
-*      in the system.
-*
-* POST-CONDITION: Interrupt flags for handled interrupts must be cleared to avoid retriggering.
-*
-* @param[in] 	None
-*
-* @return 	None	
-*
-*
-* <br><b> - HISTORY OF CHANGES - </b>
-*  
-* <hr>
 *******************************************************************************/
 void __interrupt () core16F_isr_routine (void) {
     
 #ifdef _CORE16F_SYSTEM_TIMER_ENABLE
-    ISR_CORE16F_SYSTEM_TIMER_ISR();  //Core8 System Timer
+    ISR_CORE16F_SYSTEM_TIMER_ISR();  // Handle Core16F system timer interrupt
 #endif    
 }
 

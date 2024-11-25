@@ -5,7 +5,7 @@
 * Origin Date           :   2024/04/25
 * Version               :   1.0.0
 * Compiler              :   XC8
-* Target                :   Microchip PIC16F series 
+* Target                :   Microchip PIC18F series 
 * Copyright             :   © 2024 Jamie Starling
 * All Rights Reserved
 *
@@ -48,6 +48,16 @@
 * Includes
 *******************************************************************************/
 #include "gpio_analog.h"
+
+/******************************************************************************
+***** Analog Interface
+*******************************************************************************/
+const GPIO_Analog_Interface_t GPIO_Analog = {
+  .Initialize = &GPIO_Analog_Init,
+  .SelectChannel = &GPIO_Analog_SelectChannel,
+  .PinSet = &GPIO_Analog_SetPortPin,
+  .ReadChannel =  &GPIO_Analog_ReadChannel
+};
 
 /******************************************************************************
 * Functions
@@ -95,64 +105,34 @@
 void GPIO_Analog_Init(AnalogChannelSelectEnum_t Channel)
 {
      //ADC Conversion Clock Select bits  - 
-    #if _XTAL_FREQ == 1000000
-    //1 MHz 2.0us FOSC/2
-     ADCLK = 0b00000000;
-    #endif /*_XTAL_FREQ == 1000000*/
-    
-    #if _XTAL_FREQ == 4000000
-    //4 MHz 1.0us FOSC/4
-    //ADCLK = 0b000001;    
-    
-    //4 MHz 2.0us FOSC/8
-    ADCLK = 0b000011;     
-    #endif /*_XTAL_FREQ == 4000000*/
-   
-    #if _XTAL_FREQ == 8000000
-    //8 MHz 1.0us FOSC/8
-    //ADCLK = 0b000011;    
-    
-    //8 MHz 2.0us FOSC/16
-    ADCLK = 0b000111;     
-    #endif  /*_XTAL_FREQ == 8000000*/
-           
-    #if _XTAL_FREQ == 16000000
-    //16 MHz 1.0us FOSC/16
-    //ADCLK = 0b000111;    
-    
-    //16 MHz 2.0us FOSC/32
-    ADCLK = 0b001111;     
-    #endif /*_XTAL_FREQ == 16000000*/        
-
-   #if _XTAL_FREQ == 20000000
-    //20 MHz 1.6us FOSC/32
-    //ADCLK = 0b001111;    
-    
-    //20 MHz 3.2us FOSC/64
-    ADCLK = 0b0111111;     
-    #endif /*_XTAL_FREQ == 16000000*/      
-    
-    #if _XTAL_FREQ == 32000000
-    //32 MHz 1.0us FOSC/32
-    //ADCLK = 0b001111;    
-    
-    //32 MHz 2.0us FOSC/64
-    ADCLK = 0b0111111;     
-    #endif /*_XTAL_FREQ == 16000000*/    
-    
-    #if _XTAL_FREQ == 64000000
-    //64 MHz 1.0us FOSC/64
-    ADCLK = 0b0111111;    
-    
-    //64 MHz 2.0us FOSC/128
-    //ADCLK = 0b111111;     
-    #endif /*_XTAL_FREQ == 16000000*/  
-    
+    #if _XTAL_FREQ == 1000000       //1 MHz 2.0us FOSC/2
+        ADCLK = 0b00000000;
+    #elif _XTAL_FREQ == 4000000 
+        //ADCLK = 0b000001;         //4 MHz 1.0us FOSC/4
+        ADCLK = 0b000011;           //4 MHz 2.0us FOSC/8
+    #elif _XTAL_FREQ == 8000000
+        //ADCLK = 0b000011;         //8 MHz 1.0us FOSC/8
+        ADCLK = 0b000111;           //8 MHz 2.0us FOSC/16
+    #elif _XTAL_FREQ == 16000000
+         //ADCLK = 0b000111;        //16 MHz 1.0us FOSC/16
+         ADCLK = 0b001111;          //16 MHz 2.0us FOSC/32
+    #elif _XTAL_FREQ == 20000000
+          //ADCLK = 0b001111;       //20 MHz 1.6us FOSC/32
+          ADCLK = 0b0111111;        //20 MHz 3.2us FOSC/64
+    #elif _XTAL_FREQ == 32000000         
+           //ADCLK = 0b001111;      //32 MHz 1.0us FOSC/32
+           ADCLK = 0b0111111;       //32 MHz 2.0us FOSC/64
+    #elif _XTAL_FREQ == 64000000
+           ADCLK = 0b0111111;       //64 MHz 1.0us FOSC/64
+           //ADCLK = 0b111111;      //64 MHz 2.0us FOSC/128
+    #else
+    #error "Unsupported _XTAL_FREQ value for Analog Conversion. Please check the frequency settings."
+    #endif
+       
     
     //Set Channel - 
    ADPCH = Channel;
-   
-   //ADCON1bits.ADFM = 1; //ADRESH holds the High Value
+   ADCON0bits.FM = 1; //ADC Results are right justified
     
    ADCON0bits.ON = 1;
 }
@@ -246,22 +226,8 @@ void GPIO_Analog_SelectChannel(AnalogChannelSelectEnum_t Channel)
 * <hr>
 *******************************************************************************/
 void GPIO_Analog_SetPortPin(GPIO_Ports_t PortPin, AnalogChannelSelectEnum_t Channel)
-{
-  //var that holds the registers of the Direction, Analog and PIN BitMask.
-   uint8_t *regDirection_ptr, *regAnalog_ptr, pinBitMask;
-   
-   //Get the BitMask of the PIN    
-   pinBitMask = GPIO_PinBitMask_LU[PortPin];
-   
-    //Get the register that controls the direction for the Pin
-   regDirection_ptr = (uint8_t*) GPIO_DirectionRegister_LU[PortPin];    
-   
-   //Get the register that controls the analog for the Pin
-   regAnalog_ptr = (uint8_t*) GPIO_AnalogRegister_LU[PortPin];
-   
-   *regDirection_ptr &= ~pinBitMask; 
-   *regAnalog_ptr |= pinBitMask;
-   
+{   
+   GPIO.ModeSet(PortPin,ANALOG);
    GPIO_Analog_Init(Channel);
 }
 
@@ -307,7 +273,7 @@ void GPIO_Analog_SetPortPin(GPIO_Ports_t PortPin, AnalogChannelSelectEnum_t Chan
 * <br><b> - HISTORY OF CHANGES - </b>
 * <hr>
 *******************************************************************************/
-uint16_t GPIO_Analog_ReadChannel()
+uint16_t GPIO_Analog_ReadChannel(void)
 {
    
     ADCON0bits.GO = 1;  //Start the conversion

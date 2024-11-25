@@ -1,5 +1,5 @@
 /****************************************************************************
-* Title                 :   Core8 Target Devices
+* Title                 :   Core16F Target Devices
 * Filename              :   core16_device.h
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/25
@@ -29,13 +29,6 @@
 *                           for details 
 *******************************************************************************/
 
-/*************** TODO *********************************************************
- * * 
- * 
- * 
-*****************************************************************************/
-
-
 /***************  CHANGE LIST *************************************************
 *
 *   Date        Version     Author          Description 
@@ -52,20 +45,20 @@
 *******************************************************************************/
 #include "../core16F.h"
 
-// Include configuration bits and lookup table for PIC16F15313 device
-#ifdef _CORE16F_SYSTEM_DEVICE_16F15313
-#include "16F15313_configBits.h"
-#include "16F15313_core16F_config.h"
-#include "16F15313_LU.h"
-#endif
+// Check if the device defined is PIC16F15313 and include its configuration files
+#if defined(_CORE16F_SYSTEM_DEVICE_16F15313) 
+    #include "16F15313_configBits.h"        // Configuration bits for the PIC16F15313
+    #include "16F15313_core16F_config.h"    // Core configuration specific to the PIC16F15313
+    #include "16F15313_LU.h"                // Lookup table for registers and peripherals of the PIC16F15313
 
-// Include configuration bits and lookup table for PIC16F1532X series devices
-#ifdef _CORE16F_SYSTEM_DEVICE_16F1532X
-#include "16F1532x_configBits.h"
-#include "16F1532x_core16F_config.h"
-#include "16F1532x_LU.h"
+// Check if the device defined is part of the PIC16F1532X series and include respective configuration files
+#elif defined(_CORE16F_SYSTEM_DEVICE_16F1532X) 
+    #include "16F1532x_configBits.h"        // Configuration bits for the PIC16F1532X series
+    #include "16F1532x_core16F_config.h"    // Core configuration specific to the PIC16F1532X series
+    #include "16F1532x_LU.h"                // Lookup table for registers and peripherals of the PIC16F1532X series
+#else
+    #error "Unsupported device: Please ensure the correct device is defined."
 #endif
-
 
 
 #endif /*_CORE16F_DEVICE_H*/

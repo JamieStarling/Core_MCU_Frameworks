@@ -3,9 +3,9 @@
 * Filename              :   gpio_analog.c
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/25
-* Version               :   1.0.0
+* Version               :   1.0.3
 * Compiler              :   XC8
-* Target                :   Microchip PIC16F series 
+* Target                :   Microchip PIC18F series 
 * Copyright             :   © 2024 Jamie Starling
 * All Rights Reserved
 *
@@ -28,13 +28,6 @@
 *                Visit http://jamiestarling.com/corelicense
 *                           for details 
 *******************************************************************************/
-
-/*************** TODO *********************************************************
- * 
- * 
- * 
-*****************************************************************************/
-
 
 /***************  CHANGE LIST *************************************************
 *
@@ -67,144 +60,54 @@ const GPIO_Analog_Interface_t GPIO_Analog = {
 *//** 
 * \b Description:
 *
-* This function initializes the analog-to-digital conversion (ADC) functionality 
-* for a specified analog channel on the microcontroller. It configures the conversion 
-* timing based on the system clock frequency and sets the specified analog channel for 
-* conversion.
-*
-* The function sets the conversion clock (ADCS), enables the ADC, and configures the 
-* analog result formatting to store the result in the high byte of the result register.
-*  
-* PRE-CONDITION:  
-*    - The pin should be configured as an analog input using `GPIO_SetDirection()`, 
-*      or the `GPIO_Analog_SetPortPin()` function should be used to configure the pin as analog.
-*
-* POST-CONDITION: 
-*    - The specified analog channel is initialized, and the ADC module is ready to perform conversions.
-*
-* @param[in] Channel - The analog channel to initialize, specified by 
-*                      `AnalogChannelSelectEnum_t` (e.g., ANA0, ANA1).
-*
-* @return 		void
-*
-* \b Example:
-* @code
-* 	
-* GPIO_Analog_Init(ANA0); // Initialize and configure analog channel ANA0
-* 	
-* @endcode
-*
-* \b Notes:
-* - The conversion clock timing is automatically configured based on the system clock 
-*   (_XTAL_FREQ). Different clock speeds are supported.
-* - The function enables the ADC module and sets the desired analog channel for conversion.
-*
-* <br><b> - HISTORY OF CHANGES - </b>
+* Parameters:
+*   - Channel (AnalogChannelSelectEnum_t): The analog channel to initialize 
+*     (e.g., ANA0, ANA1).
 
 *******************************************************************************/
 void GPIO_Analog_Init(AnalogChannelSelectEnum_t Channel)
 {
      //ADC Conversion Clock Select bits  - 
-    #if _XTAL_FREQ == 1000000
-    //1 MHz 2.0us FOSC/2
-     ADCLK = 0b00000000;
-    #endif /*_XTAL_FREQ == 1000000*/
-    
-    #if _XTAL_FREQ == 4000000
-    //4 MHz 1.0us FOSC/4
-    //ADCLK = 0b000001;    
-    
-    //4 MHz 2.0us FOSC/8
-    ADCLK = 0b000011;     
-    #endif /*_XTAL_FREQ == 4000000*/
-   
-    #if _XTAL_FREQ == 8000000
-    //8 MHz 1.0us FOSC/8
-    //ADCLK = 0b000011;    
-    
-    //8 MHz 2.0us FOSC/16
-    ADCLK = 0b000111;     
-    #endif  /*_XTAL_FREQ == 8000000*/
-           
-    #if _XTAL_FREQ == 16000000
-    //16 MHz 1.0us FOSC/16
-    //ADCLK = 0b000111;    
-    
-    //16 MHz 2.0us FOSC/32
-    ADCLK = 0b001111;     
-    #endif /*_XTAL_FREQ == 16000000*/        
-
-   #if _XTAL_FREQ == 20000000
-    //20 MHz 1.6us FOSC/32
-    //ADCLK = 0b001111;    
-    
-    //20 MHz 3.2us FOSC/64
-    ADCLK = 0b0111111;     
-    #endif /*_XTAL_FREQ == 16000000*/      
-    
-    #if _XTAL_FREQ == 32000000
-    //32 MHz 1.0us FOSC/32
-    //ADCLK = 0b001111;    
-    
-    //32 MHz 2.0us FOSC/64
-    ADCLK = 0b0111111;     
-    #endif /*_XTAL_FREQ == 16000000*/    
-    
-    #if _XTAL_FREQ == 64000000
-    //64 MHz 1.0us FOSC/64
-    ADCLK = 0b0111111;    
-    
-    //64 MHz 2.0us FOSC/128
-    //ADCLK = 0b111111;     
-    #endif /*_XTAL_FREQ == 16000000*/  
-    
+    #if _XTAL_FREQ == 1000000       //1 MHz 2.0us FOSC/2
+        ADCLK = 0b00000000;
+    #elif _XTAL_FREQ == 4000000 
+        //ADCLK = 0b000001;         //4 MHz 1.0us FOSC/4
+        ADCLK = 0b000011;           //4 MHz 2.0us FOSC/8
+    #elif _XTAL_FREQ == 8000000
+        //ADCLK = 0b000011;         //8 MHz 1.0us FOSC/8
+        ADCLK = 0b000111;           //8 MHz 2.0us FOSC/16
+    #elif _XTAL_FREQ == 16000000
+         //ADCLK = 0b000111;        //16 MHz 1.0us FOSC/16
+         ADCLK = 0b001111;          //16 MHz 2.0us FOSC/32
+    #elif _XTAL_FREQ == 20000000
+          //ADCLK = 0b001111;       //20 MHz 1.6us FOSC/32
+          ADCLK = 0b0111111;        //20 MHz 3.2us FOSC/64
+    #elif _XTAL_FREQ == 32000000         
+           //ADCLK = 0b001111;      //32 MHz 1.0us FOSC/32
+           ADCLK = 0b0111111;       //32 MHz 2.0us FOSC/64
+    #elif _XTAL_FREQ == 64000000
+           ADCLK = 0b0111111;       //64 MHz 1.0us FOSC/64
+           //ADCLK = 0b111111;      //64 MHz 2.0us FOSC/128
+    #else
+    #error "Unsupported _XTAL_FREQ value for Analog Conversion. Please check the frequency settings."
+    #endif
+       
     
     //Set Channel - 
    ADPCH = Channel;
-   
-   //ADCON1bits.ADFM = 1; //ADRESH holds the High Value
+   ADCON0bits.FM = 1; //ADC Results are right justified
     
    ADCON0bits.ON = 1;
 }
 
 /******************************************************************************
 * Function : GPIO_Analog_SelectChannel()
-*//** 
-* \b Description:
+* Description:Selects an analog channel for ADC conversions by setting the channel select 
+*   bits (CHS) in the ADCON0 register.
 *
-* This function selects an analog channel for the ADC (Analog-to-Digital Converter)
-* to perform conversions on. The selected channel is configured for subsequent
-* ADC readings. 
-*
-* The function modifies the ADC channel select bits (CHS) in the ADCON0 register
-* to point to the desired analog channel.
-*
-* PRE-CONDITION:  
-*    - The pin associated with the analog channel must be configured as an analog input 
-*      using `GPIO_SetDirection()` or `GPIO_Analog_SetPortPin()`.
-*    - The ADC module must be initialized using `GPIO_Analog_Init()` before selecting channels.
-*
-* POST-CONDITION: 
-*    - The specified analog channel is selected for ADC conversions.
-*
-* @param[in] Channel - The analog channel to select, specified by 
-*                      `AnalogChannelSelectEnum_t` (e.g., ANA0, ANA1, etc.).
-*
-*
-* @return 		void
-*
-* \b Example:
-* @code
-* 	
-* GPIO_Analog_SelectChannel(ANA0); //Selects analog channel ANA0
-* 	
-* @endcode
-*
-* \b Notes:
-* - The ADC must be initialized before selecting a channel.
-* - The selected channel will be used for future ADC conversions until another channel is selected.
-*
-* <br><b> - HISTORY OF CHANGES - </b>
+* Parameters:
+*   - Channel (AnalogChannelSelectEnum_t): The analog channel to select 
+*     (e.g., ANA0, ANA1).
 
 *******************************************************************************/
 void GPIO_Analog_SelectChannel(AnalogChannelSelectEnum_t Channel)
@@ -214,111 +117,32 @@ void GPIO_Analog_SelectChannel(AnalogChannelSelectEnum_t Channel)
 
 /******************************************************************************
 * Function : GPIO_Analog_SetPortPin()
-*//** 
-* \b Description:
+* Description:Configures a GPIO pin for analog input and initializes the ADC with the 
+* specified analog channel.
 *
-* This function configures a specific GPIO pin to be used for analog input in the 
-* Analog-to-Digital Converter (ADC). It modifies the direction and analog register 
-* settings for the specified pin and initializes the ADC to use the selected analog 
-* channel.
-*
-* The function sets the pin as an analog input and enables the corresponding analog 
-* channel. After setting the pin direction, it calls `GPIO_Analog_Init()` to configure 
-* the ADC for proper operation.
-*
-* PRE-CONDITION:  
-*    - The ADC module must be initialized with the proper conversion timing using `GPIO_Analog_Init()`.
-*
-* POST-CONDITION: 
-*    - The GPIO pin is configured for analog input, and the selected analog channel 
-*      is ready for ADC conversions.
-*
-* @param[in] PortPin - The GPIO pin to configure for analog input, specified by 
-*                      `GPIO_Ports_t` (e.g., PORTA_0, PORTC_1).
-* @param[in] Channel - The analog channel to associate with the GPIO pin, specified by 
-*                      `AnalogChannelSelectEnum_t` (e.g., ANA0, ANA1, etc.).
-*
-* @return None		
-*
-* \b Example:
-* @code
-* 	
-* GPIO_Analog_SetPortPin(PORTA_0, ANA0);  / Set PORTA pin 0 as an analog input sets ADC to channel ANA0
-* 	
-* @endcode
-*
-* \b Notes:
-* - This function sets the pin direction as analog input and initializes the analog channel.
-* - After calling this function, the selected GPIO pin will be configured for ADC conversion.
-*
-* <br><b> - HISTORY OF CHANGES - </b>
-
-* <hr>
+* Parameters:
+*   - PortPin (GPIO_Ports_t): The GPIO pin to configure (e.g., PORTA_0, PORTC_1).
+*   - Channel (AnalogChannelSelectEnum_t): The analog channel to associate with 
+*     the pin (e.g., ANA0, ANA1).
 *******************************************************************************/
 void GPIO_Analog_SetPortPin(GPIO_Ports_t PortPin, AnalogChannelSelectEnum_t Channel)
-{
-  //var that holds the registers of the Direction, Analog and PIN BitMask.
-   //uint8_t *regDirection_ptr, *regAnalog_ptr, pinBitMask;
-   
-   //Get the BitMask of the PIN    
-   //pinBitMask = GPIO_PinBitMask_LU[PortPin];
-   
-    //Get the register that controls the direction for the Pin
-   //regDirection_ptr = (uint8_t*) GPIO_DirectionRegister_LU[PortPin];    
-   
-   //Get the register that controls the analog for the Pin
-   //regAnalog_ptr = (uint8_t*) GPIO_AnalogRegister_LU[PortPin];
-   
-   //*regDirection_ptr |= ~pinBitMask; 
-   //*regAnalog_ptr |= pinBitMask;
-   
+{   
    GPIO.ModeSet(PortPin,ANALOG);
    GPIO_Analog_Init(Channel);
 }
 
 /******************************************************************************
 * Function : GPIO_Analog_ReadChannel()
-*//** 
-* \b Description:
+* Description:Starts an ADC conversion on the selected channel, waits for it to complete, 
+* and returns the 10-bit conversion result.
 *
-* This function starts an analog-to-digital conversion (ADC) on the selected 
-* analog channel and waits for the conversion to complete. Once the conversion 
-* is done, it returns the 10-bit result of the ADC conversion.
+* Parameters:
+*   - None
 *
-* The function initiates the ADC by setting the `GOnDONE` bit in the ADCON0 register,
-* waits for the conversion to complete, and then reads the result from the ADC result
-* registers (ADRESH and ADRESL). The 10-bit result is returned to the caller.
-*
-* PRE-CONDITION:  
-*    - The pin and analog channel must be configured for analog input using 
-*      `GPIO_Analog_SetPortPin()` and `GPIO_Analog_Init()`.
-*
-* POST-CONDITION: 
-*    - The ADC result is returned as a 10-bit value representing the analog input.
-*
-* @param[in] None
-*
-* @return uint16_t
-*    - The 10-bit result of the ADC conversion.
-*
-* \b Example:
-* @code
-* // Set up the pin and analog channel
-* GPIO_Analog_SetPortPin(PORTA_0, ANA0);
-* GPIO_Analog_Init(ANA0);
-*
-* // Read the analog value from channel ANA0
-* uint16_t adcValue = GPIO_Analog_ReadChannel(); 	
-*
-* 	
-* @endcode
-*
-* 
-*
-* <br><b> - HISTORY OF CHANGES - </b>
-* <hr>
+* Returns:
+*   - uint16_t: The 10-bit ADC conversion result.
 *******************************************************************************/
-uint16_t GPIO_Analog_ReadChannel()
+uint16_t GPIO_Analog_ReadChannel(void)
 {
    
     ADCON0bits.GO = 1;  //Start the conversion
@@ -329,7 +153,7 @@ uint16_t GPIO_Analog_ReadChannel()
     
     uint16_t adc_result;
     
-    adc_result = CORE18F_Make_16(ADRESH,ADRESL);
+    adc_result = CORE.Make16(ADRESH,ADRESL);
     
     //adc_result = (uint16_t)(ADRESH<<8) | (uint16_t) ADRESL;
     

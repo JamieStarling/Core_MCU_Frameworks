@@ -3,7 +3,7 @@
 * Filename              :   core18F_init.c
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/25
-* Version               :   1.0.0
+* Version               :   1.0.1
 * Compiler              :   XC8 
 * Target                :   Microchip PIC18F series
 * Copyright             :   © 2024 Jamie Starling
@@ -29,12 +29,6 @@
 *                           for details 
 *******************************************************************************/
 
-/*************** TODO *********************************************************
- * 
- * 
- * 
-*****************************************************************************/
-
 /***************  CHANGE LIST *************************************************
 *
 *   Date        Version     Author          Description 
@@ -52,9 +46,25 @@
 *******************************************************************************/
 const CORE18F_System_Interface_t CORE = {
     .Initialize = &CORE18F_init,
+    
     #ifdef _CORE18F_SYSTEM_INCLUDE_DELAYS_ENABLE
-    .Delay_MS = &CORE18F_Delay_BlockingMS
+    	.Delay_MS = &CORE18F_Delay_BlockingMS,
     #endif /*_CORE18F_SYSTEM_INCLUDE_DELAYS_ENABLE*/
+    
+    #ifdef _CORE18F_SYSTEM_EVENTS_ENABLE
+        .Events_Initialize = &TimedEventSystem_Init,
+        .Events_Add = &ScheduleEvent,
+        .Events_Check = &CheckEvents,
+        .Events_Remove = &CancelEvent,
+    #endif
+
+    .Make16 = &CORE_Make_16,
+    .Low4 = &CORE_Return_4bit_Low,
+    .High4 = &CORE_Return_4bit_High,
+    .Set_Bit = &CORE_Set_Bit,
+    .Clear_Bit = &CORE_Clear_Bit,
+    .FloatToString =&CORE_floatToString,
+    .IntToString = &CORE_intToString,
 };
 
 /******************************************************************************
@@ -62,32 +72,19 @@ const CORE18F_System_Interface_t CORE = {
 *******************************************************************************/
 /******************************************************************************
 * Function : CORE18F_init()
-*//*
-* \b Description:
-*
-* Initializes the Core8 system for the PIC16F series microcontrollers.
-* If the system timer is enabled (via _CORE18F_SYSTEM_TIMER_ENABLE), 
-* this function will initialize the system timer by calling ISR_CORE18F_SYSTEM_TIMER_Init()
+* Description: Initializes the Core18F system for PIC1F MCUs, setting up timers and 
+* events if they are enabled in the configuration.
 * 
-* \b Example:
-* @code
-* 
-* In your main.c file:* 
-* CORE18F_init(); // Initialize Core8 system, including the system timer if enabled
-* 	
-* @endcode
-*
-* 
-*
-* <br><b> - HISTORY OF CHANGES - </b>
-*  
-* <hr>
 *******************************************************************************/
 void CORE18F_init(void)
 {
     #ifdef _CORE18F_SYSTEM_TIMER_ENABLE
-    ISR_CORE18F_SYSTEM_TIMER_Init();
-    #endif
+    	ISR_CORE18F_SYSTEM_TIMER_Init(); // Initializes Timer ISR for system timing
+    
+    #ifdef _CORE18F_SYSTEM_EVENTS_ENABLE
+        CORE.Events_Initialize();        // Initializes Core 18F Event System
+    #endif //_CORE18F_SYSTEM_EVENTS_ENABLE
+    #endif //_CORE18F_SYSTEM_TIMER_ENABLE
 }
 
 /*** End of File **************************************************************/

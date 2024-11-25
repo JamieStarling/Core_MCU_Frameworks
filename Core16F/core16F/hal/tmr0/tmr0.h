@@ -29,18 +29,11 @@
 *                           for details 
 *******************************************************************************/
 
-/*************** TODO *********************************************************
- * * 
- * 
- * 
-*****************************************************************************/
-
 /***************  CHANGE LIST *************************************************
 *
 *   Date        Version     Author          Description 
 *   2024/04/30  1.0.0       Jamie Starling  Initial Version
 *  
-*
 *****************************************************************************/
 #ifndef _CORE16F_TMR0_H
 #define _CORE16F_TMR0_H
@@ -80,9 +73,9 @@ void TMR0_Set_Input_Async_Mode(LogicEnum_t setState);
 void TMR0_Set_Prescaler_Rate(TMR0_PreScaler_SelectEnum_t value);
 uint8_t TMR0_Get_8bit_Value(void);
 uint16_t TMR0_Get_16bit_Value(void);
-void TMR0_Clear_Interrupt_Flag(void);
+inline void TMR0_Clear_Interrupt_Flag(void);
 void TMR0_Enable_Interrupt(LogicEnum_t setState);
-LogicEnum_t TMR0_Interrupt_Flag_Set(void);
+inline LogicEnum_t TMR0_Interrupt_Flag_Set(void);
 
 #endif /*_CORE16F_TMR0_H*/
 

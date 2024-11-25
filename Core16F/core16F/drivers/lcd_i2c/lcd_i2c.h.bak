@@ -1,0 +1,128 @@
+/****************************************************************************
+* Title                 :   LCD I2C Drivers
+* Filename              :   lcd_i2c.h
+* Author                :   Jamie Starling
+* Origin Date           :   2024/10/15
+* Version               :   1.0.0
+* Compiler              :   XC8
+* Target                :   
+* Copyright             :   Jamie Starling
+* All Rights Reserved
+*
+* THIS SOFTWARE IS PROVIDED BY JAMIE STARLING "AS IS" AND ANY EXPRESSED
+* OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+* OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+* IN NO EVENT SHALL JAMIE STARLING OR ITS CONTRIBUTORS BE LIABLE FOR ANY
+* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+* STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+* IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+* THE POSSIBILITY OF SUCH DAMAGE.
+*
+*******************************************************************************/
+
+/******************************************************************************
+*                     LICENSED FOR NON-COMMERCIAL USE
+*                Visit http://jamiestarling.com/corelicense
+*                           for details 
+*******************************************************************************/
+
+
+/***************  CHANGE LIST *************************************************
+*
+*    Date    Version   Author         Description 
+*    2024/10/16  1.0.0       Jamie Starling  Initial Version
+*  
+*****************************************************************************/
+
+#ifndef _CORE_LCD_I2C_H
+#define _CORE_LCD_I2C_H
+/******************************************************************************
+* Includes
+*******************************************************************************/
+#include <xc.h>
+#include <stdint.h>			/* For standard type definitions */
+#include "../../core_version.h"
+
+#ifdef _CORE16_MCU
+#include "../../core16F.h"
+#endif
+
+#ifdef _CORE18_MCU
+#include "../../core18F.h"
+#endif
+
+/******************************************************************************
+* Constants
+*******************************************************************************/
+#define _LCD_RS_CMD 0 
+#define _LCD_RS_DATA 1 
+#define _LCD_CMD_4bit_Mode_1 0b00110011
+#define _LCD_CMD_4bit_Mode_2 0b00110010
+#define _LCD_CMD_Function_Set 0b00101000
+#define _LCD_CMD_Display_Set 0b00001110
+#define _LCD_CMD_CLEAR 0b00000001
+
+#define _LCD_LINE_1 0x00
+#define _LCD_LINE_2 0x40
+#define _LCD_LINE_3 0x14
+#define _LCD_LINE_4 0x54
+
+#define _LCD_INIT_DELAY_MS 10
+#define _LCD_CLEAR_DELAY_MS 5
+
+/******************************************************************************
+* Typedefs
+*******************************************************************************/
+typedef enum
+{
+ LCD_I2C_OK,
+ LCD_I2C_GENERIC_ERROR,
+ LCD_I2C_INVALID_ADDRESS 
+}LCD_I2C_Status_Enum_t;
+
+
+typedef struct
+{
+    uint8_t RS : 1;
+    uint8_t RW : 1;
+    uint8_t EN : 1;
+    uint8_t BackLight : 1;
+    uint8_t LCD_DATA : 4;  
+}LCD_DATA_t;
+
+typedef union {
+    LCD_DATA_t bits;      // Access individual bits
+    uint8_t byte;         // Access the entire byte
+} LCD_DATA_ByteAccess;
+
+extern LCD_DATA_ByteAccess LCD_Data;
+
+/******************************************************************************
+***** LCD_I2C Interface
+*******************************************************************************/
+typedef struct {
+  LCD_I2C_Status_Enum_t (*Initialize)(uint8_t address);
+  LCD_I2C_Status_Enum_t (*BlackLight)(uint8_t address, LogicEnum_t set_light);
+  LCD_I2C_Status_Enum_t (*Location)(uint8_t address, uint8_t row, uint8_t column);
+  LCD_I2C_Status_Enum_t (*Clear)(uint8_t address);
+  LCD_I2C_Status_Enum_t (*Write_Character)(uint8_t address, uint8_t character);
+  LCD_I2C_Status_Enum_t (*Write)(uint8_t address, char *StringData);
+}LCD_I2C_Interface_t;
+
+extern const LCD_I2C_Interface_t LCD;
+
+/******************************************************************************
+* Function Prototypes
+*******************************************************************************/
+LCD_I2C_Status_Enum_t LCD_I2C_init(uint8_t address);
+LCD_I2C_Status_Enum_t LCD_I2C_BackLight(uint8_t address, LogicEnum_t set_light);
+LCD_I2C_Status_Enum_t LCD_I2C_Location(uint8_t address, uint8_t row, uint8_t column);
+LCD_I2C_Status_Enum_t LCD_I2C_Clear_Display(uint8_t address);
+LCD_I2C_Status_Enum_t LCD_I2C_Write_Character(uint8_t address, uint8_t character);
+LCD_I2C_Status_Enum_t LCD_I2C_Write_String(uint8_t address, char *StringData);
+#endif /*_CORE_LCD_I2C_H*/
+
+/*** End of File **************************************************************/

@@ -1,7 +1,7 @@
 /****************************************************************************
 * Title                 :   Serial1 Functions - Enhanced Universal Synchronous
 *                           Asynchronous Receiver Transmitter
-* Filename              :   eusart1.c
+* Filename              :   serial1.c
 * Author                :   Jamie Starling
 * Origin Date           :   2024/04/25
 * Version               :   1.0.2
@@ -30,13 +30,6 @@
 *                           for details 
 *******************************************************************************/
 
-/*************** TODO *********************************************************
- * Implement support for additional baud rates based on varying clock speeds.
- * Add error handling for overrun or framing errors.
- * 
-*****************************************************************************/
-
-
 /***************  CHANGE LIST *************************************************
 *
 *   Date        Version     Author          Description 
@@ -50,7 +43,7 @@
 *******************************************************************************/
 #include "serial1.h"
 #include "../pps/pps.h"
-#include <string.h>
+//#include <string.h>
 
 /******************************************************************************
 ***** SERIAL1 Interface
@@ -62,7 +55,9 @@ const SERIAL1_Interface_t SERIAL1 = {
     .IsDataAvailable = &SERIAL1_HasReceiveData,
     .IsTransmitComplete = &SERIAL1_IsTSREmpty,
     .ReadByte = &SERIAL1_GetReceivedData,
-    .IsTransmitBufferReady = &SERIAL1_IsTXBufferEmpty
+    .IsTransmitBufferReady = &SERIAL1_IsTXBufferEmpty,
+    .IsError = &SERIAL1_IsError,
+    .ClearErrors = &SERIAL1_Clear_Error,
 };
 
 
@@ -71,268 +66,153 @@ const SERIAL1_Interface_t SERIAL1 = {
 *******************************************************************************/
 /******************************************************************************
 * Function : SERIAL1_Init()
-*//** 
-* \b Description:
+* Description: Initializes the SERIAL1 module with the selected baud rate and configuration 
+* settings. Configures the baud rate registers, input/output pins, and enables 
+* the transmitter and receiver.
 *
-* Initializes the SERIAL1 module with the selected baud rate configuration.
- * This function configures the baud rate, input/output pins, and enables the
- * transmitter and receiver based on the settings in the configuration array.
-*  
-* PRE-CONDITION:  None
-*
-* POST-CONDITION: The selected baud rate and settings are applied to SERIAL1.
-*
-* @param[in] SerialBaudEnum_t : From ESUART Lookup Table
-*
-* @return 		
-*
-* \b Example:
-* @code
-* 	
-* SERIAL1_Init(BAUD_9600);  //Configures ESUART1 for 9600 Baud
-* 	
-* @endcode
-*
-* 
-*
-* <br><b> - HISTORY OF CHANGES - </b>
-*  
-* <hr>
+* Parameters:
+*   - BaudSelect (SerialBaudEnum_t): The baud rate configuration from the SERIAL1 
+*     lookup table (e.g., BAUD_9600).
 *******************************************************************************/
 void SERIAL1_Init(SerialBaudEnum_t BaudSelect)
 {  
- 
   SP1BRG = SERIAL1_Config[BaudSelect].SP1BRG_Value;
   BAUD1CONbits.BRG16 = SERIAL1_Config[BaudSelect].BRG16_Enable;
   TX1STAbits.SYNC = SERIAL1_Config[BaudSelect].SYNC_Enable;
   TX1STAbits.BRGH = SERIAL1_Config[BaudSelect].BRGH_Enable;
   
-  GPIO_SetDirection(_CORE16F_SERIAL1_INPUT_PIN,INPUT);  //Set as input -> Serial In
+  // Configure the serial input pin as an input
+  GPIO_SetDirection(_CORE16F_SERIAL1_INPUT_PIN,INPUT);  
   
-  PPS_MapOutput(_CORE16F_SERIAL1_OUTPUT_PIN,PPSOUT_TX1_CK1);  //Map TX to ->Serial Out
+  // Map TX output pin
+  PPS_MapOutput(_CORE16F_SERIAL1_OUTPUT_PIN,PPSOUT_TX1_CK1);  
     
+  // Enable receiver and transmitter
   RC1STAbits.CREN = SERIAL1_Config[BaudSelect].CREN_Enable;
   TX1STAbits.TXEN = SERIAL1_Config[BaudSelect].TXEN_Enable;
-  RC1STAbits.SPEN = SERIAL1_Config[BaudSelect].SPEN_Enable;     
-  
+  RC1STAbits.SPEN = SERIAL1_Config[BaudSelect].SPEN_Enable;       
 }
 
 /******************************************************************************
 * Function : SERIAL1_WriteByte()
-*//** 
-* \b Description:
+* Description: Writes a byte of data to the SERIAL1 transmit shift register (TSR). This 
+*   function waits until the TSR buffer is ready before sending the byte.
 *
-* Writes a byte of data to the SERIAL1 transmit shift register (TSR).
-* 
- * This function waits until the TSR buffer has space available and then writes
- * a byte of data for transmission over the SERIAL1 serial port. It blocks execution
- * until the buffer is ready.
-*  
-* PRE-CONDITION:  SERIAL1 module must be properly configured and initialized
-* 
+* Parameters:
+*   - SerialData (uint8_t): The byte of data to transmit.
 *
-* POST-CONDITION: The byte is written to the TSR buffer for transmission.
-*
-* @param[in] SerialData  The byte of data to transmit.
-*
-* @return 		
-*
-* \b Example:
-* @code
-* 	
-* SERIAL1_WriteByte('A');  / Transmit character 'A'
-* 	
-* @endcode
-*
-* 
-*
-* <br><b> - HISTORY OF CHANGES - </b>
-
 *******************************************************************************/
-void SERIAL1_WriteByte(uint8_t SerialData)
+SERIAL1_Status_Enum_t SERIAL1_WriteByte(uint8_t SerialData)
 {
-    while (!PIR3bits.TX1IF){}
+    uint16_t timeout_counter = _SERIAL1_TIMEOUT_VALUE;   
+  
+    while(!PIR3bits.TX1IF && timeout_counter-- > 0){}  
+    if (timeout_counter == 0){return TIMEOUT;}    
     TX1REG = SerialData;     
+    return OK;
 }
 
 /******************************************************************************
 * Function : SERIAL1_WriteString()
-*//** 
-* \b Description:
+* Description: Writes a string to the SERIAL1 transmit buffer, sending one byte at a time. 
+*   The function blocks until the buffer is ready for each byte.
 *
-* Writes a string of data to the SERIAL1 transmit buffer (TSR).
-* This function will block if the buffer is full, waiting until the buffer
-* has space to accept new data. The function writes one byte at a time
-*  
-* PRE-CONDITION:  SERIAL1 module must be properly configured and initialized
-* 
+* Parameters:
+*   - StringData (char*): Pointer to the string to be transmitted.
 *
-* POST-CONDITION: 
-*
-* @param[in] *StringData - buffer of data	
-*
-* @return 		
-*
-* \b Example:
-* @code
-* SERIAL1_WriteString("Hello, world!");  // Send a string of data	
-*
-* 	
-* @endcode
-*
-* 
-*
-* <br><b> - HISTORY OF CHANGES - </b>
-
 *******************************************************************************/
-void SERIAL1_WriteString(char *StringData)
-{
-    uint8_t counter = 0;
-    size_t length = strlen(StringData);
-    
+SERIAL1_Status_Enum_t SERIAL1_WriteString(char *StringData)
+{   
+    SERIAL1_Status_Enum_t SendStatus;
     // Loop through the string and transmit each character
-    while (counter < length){        
-        SERIAL1_WriteByte(StringData[counter]); // Send each byte individually
-        counter++;       
+    for (; *StringData != '\0'; StringData++) {
+        SendStatus = SERIAL1_WriteByte(*StringData); // Send each byte
+        if (SendStatus != OK){return SendStatus;}
     }
+    return OK;
 }
 
 /******************************************************************************
 * Function : SERIAL1_HasReceiveData()
-*//** 
-* \b Description:
+* Description:Checks if the SERIAL1 module has received data in its FIFO buffer.
 *
-* Checks the state of ESUART FIFO Buffer for any received data.  
-* 
-* 
-* PRE-CONDITION: SERIAL1 module must be properly configured and initialized 
-* 
-* POST-CONDITION: None
 *
-* @param[in] : None	
-*
-* @return : TRUE if Data present, Otherwise FALSE.		
-*
-* \b Example:
-* @code
-* 	
-* bool status = SERIAL1_HasReceiveData(); //Checks the status for any received data
-* 	
-* @endcode
-*
-* 
-*
-* <br><b> - HISTORY OF CHANGES - </b>
-
+* Returns:
+*   - LogicEnum_t: TRUE if data is present, FALSE otherwise.
 *******************************************************************************/
 LogicEnum_t SERIAL1_HasReceiveData(void)
 {
-    uint8_t RCBufferStatus = PIR3bits.RC1IF;    
-    return RCBufferStatus;
+    return (PIR3bits.RC1IF) ? TRUE : FALSE; // Return TRUE if data is present
 }
 
 /******************************************************************************
 * Function : SERIAL1_IsTSREmpty()
-*//** 
-* \b Description:
+* Description: Checks if the transmit shift register (TSR) of the SERIAL1 module is empty.
 *
-* Returns the status of the transmit buffer TSR.
-* 0 - TSR Full
-* 1 - TSR Empty
-* 
-* PRE-CONDITION:  SERIAL1 module must be properly configured and initialized 
+* Returns:
+*   - LogicEnum_t: TRUE if TSR is empty, FALSE if it is full.
 *
-* POST-CONDITION: None
-*
-* @param[in] : None
-*
-* @return : TRUE If Empty / Other wise false.
-*
-* \b Example:
-* @code
-* 	
-*
-* 	
-* @endcode
-*
-* 
-*
-* <br><b> - HISTORY OF CHANGES - </b>
-
 *******************************************************************************/
 LogicEnum_t SERIAL1_IsTSREmpty(void)
 {
-    uint8_t TXStatus = TX1STAbits.TRMT;
-    return TXStatus;
+    return (TX1STAbits.TRMT) ? TRUE : FALSE; // Return TRUE if TSR is empty
 }
-/*** End of File **************************************************************/
+
 
 /******************************************************************************
 * Function : SERIAL1_GetReceivedData()
-*//** 
-* \b Description:
+* Description: Returns the byte of data currently in the SERIAL1 receive buffer.
 *
-* Returns the data in the serial receive buffer
-* 
-* PRE-CONDITION:  
-* PRE-CONDITION: 
+* Parameters:
+*   - None
 *
-* POST-CONDITION: 
+* Returns:
+*   - uint8_t: The received byte from the serial buffer.
 *
-* @param[in] 	
-*
-* @return  uint8_t of received data		
-*
-* \b Example:
-* @code
-* 	
-*
-* 	
-* @endcode
-*
-* 
-*
-* <br><b> - HISTORY OF CHANGES - </b>
-
 *******************************************************************************/
 uint8_t SERIAL1_GetReceivedData(void)
 {
-    return RC1REG; 
+    return RC1REG;  // Return the received data from the buffer
 }
 
 /******************************************************************************
 * Function : SERIAL1_IsTXBufferEmpty()
-*//** 
-* \b Description:
+* Description: Checks if the SERIAL1 transmit buffer is empty.
 *
-* Return 1 if the TX Buffer is empty
-* 
-* PRE-CONDITION:  
-* PRE-CONDITION: 
+* Returns:
+*   - LogicEnum_t: TRUE if the TX buffer is empty, FALSE otherwise.
 *
-* POST-CONDITION: 
-*
-* @param[in] 	
-*
-* @return 		
-*
-* \b Example:
-* @code
-* 	
-*
-* 	
-* @endcode
-*
-* 
-*
-* <br><b> - HISTORY OF CHANGES - </b>
-
 *******************************************************************************/
 LogicEnum_t SERIAL1_IsTXBufferEmpty(void)
 {
-    uint8_t TXBuffer_Status = PIR3bits.TX1IF;    
-    return TXBuffer_Status;
+    return (PIR3bits.TX1IF) ? TRUE : FALSE; // Return TRUE if the TX buffer is empty
 }
 
+/******************************************************************************
+* Function : SERIAL1_IsError()
+* Description: Checks if the SERIAL1 has any errors
+*
+* Returns:
+*   - SERIAL1_Error_Enum_t: Error Code or SERIAL1_OK
+*
+*******************************************************************************/
+SERIAL1_Status_Enum_t SERIAL1_IsError(void)
+{
+  if (RC1STAbits.FERR){return FRAMMING_ERROR;}
+  if (RC1STAbits.OERR){return OVERRUN_ERROR;}
+  return OK;
+}
+
+/******************************************************************************
+* Function : SERIAL1_Clear_Error()
+* Description: Clears SERIAL1 of any errors.
+*******************************************************************************/
+void SERIAL1_Clear_Error(void)
+{
+  SERIAL1_GetReceivedData();
+  RC1STAbits.CREN = CLEAR;
+  NOP();
+  RC1STAbits.CREN = SET;
+}
 
 /*** End of File **************************************************************/
