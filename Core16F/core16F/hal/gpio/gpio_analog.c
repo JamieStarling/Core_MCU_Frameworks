@@ -147,7 +147,7 @@ uint16_t GPIO_Analog_ReadChannel(void)
     
    while (ADCON0bits.GOnDONE == 1){}   
        
-   adc_result = CORE.Make_16(ADRESH,ADRESL);    
+   adc_result = CORE.Make16(ADRESH,ADRESL);    
    return adc_result;    //Verify that this returns 10bit result    
 }
 

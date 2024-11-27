@@ -55,7 +55,7 @@
 
 /*GPIO and Analog*/
 //#define _CORE16F_HAL_GPIO_CONFIG_ENABLE  //Enabled GPIO to Be Set Through Lookup Table
-//#define _CORE16F_HAL_GPIO_ANALOG_ENABLE  //Enable Analog Features
+#define _CORE16F_HAL_GPIO_ANALOG_ENABLE  //Enable Analog Features
 
 /*Timer Functions*/
 //#define _CORE16F_HAL_TMR0_ENABLE  //System Timer Uses TMR0 - Don't need to enable if using the system timer

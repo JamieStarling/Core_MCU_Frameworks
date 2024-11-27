@@ -142,7 +142,7 @@ uint8_t ONE_WIRE_Read(void)
   OW_DIRECTION_REGISTER = 1;  // Set pin as input
   
   return (OW_PINREAD_REGISTER) ? 1 : 0;
-
+}
 
 /******************************************************************************
 * Function : ONE_WIRE_Write_Bit()

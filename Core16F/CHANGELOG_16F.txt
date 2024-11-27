@@ -1,30 +1,8 @@
-/***************  CHANGE LIST *************************************************
+***************  CHANGE LIST *************************************************
 
+*************Version 1.10*****************************************************
 Date        Version     Author          Description 
-2024/04/25  1.0.0       Jamie Starling  Initial Version
-2024/09/11  1.0.1       Jamie Starling  {UPDATE}Changed ESUART1 to SERIAL1
+2024/11/27  1.10.1      Jamie Starling  {FIX}Corrected CORE API Make16 Calls
 
-2024/09/11  1.0.1       Jamie Starling  {UPDATE}Added ISR_Enable_System_Default - to isr_control to enable a config default isr control
-2024/09/11  1.0.1       Jamie Starling  {UPDATE}Change serial1_isr enable for TX and RC to use ISR_Enable_System_Default
-2024/09/13  1.0.1       Jamie Starling  {UPDATE}Added Interface to GPIO : GPIO
-2024/09/13  1.0.1       Jamie Starling  {UPDATE}Added Interface to GPIO Analog : GPIO_Analog
-2024/09/13  1.0.1       Jamie Starling  {UPDATE}Added Interface to Core System : CORE.Initialize
-2024/09/13  1.0.1       Jamie Starling  {UPDATE}Added Interface to Core System : CORE.Delay_MS
-2024/09/13  1.0.1       Jamie Starling  {UPDATE}Added Interface to PPS : PPS
-2024/09/13  1.0.1       Jamie Starling  {UPDATE}Added Interface to PWM3 : PWM3
-2024/09/13  1.0.1       Jamie Starling  {UPDATE}Added Interface to PWM4 : PWM4
-2024/09/13  1.0.1       Jamie Starling  {UPDATE}Added Interface to PWM5 : PWM5
-2024/09/13  1.0.1       Jamie Starling  {UPDATE}Added Interface to PWM6 : PWM6
-2024/09/13  1.0.2       Jamie Starling  {UPDATE}Added Interface to SERIAL1 : SERIAL1
-2024/09/13  1.0.1       Jamie Starling  {UPDATE}Added Interface to TMR0 : TIMER0
-2024/09/13  1.0.1       Jamie Starling  {UPDATE}Added Interface to TMR1 : TIMER1
-2024/09/13  1.0.1       Jamie Starling  {UPDATE}Added Interface to TMR2 : TIMER2
-2024/09/24  1.0.1       Jamie Starling  {UPDATE}Added Interface to I2C1 : I2C1_MASTER
-2024/09/24  1.0.1       Jamie Starling  {UPDATE}Added Interface to ONE WIRE : ONE_WIRE
-2024/09/27  1.0.1       Jamie Starling  {FIX}Corrected Analog Naming for 16F15313_LU.h
-2024/09/27  1.0.2       Jamie Starling  {FIX}Corrected Analog Input for GPIO_Analog_SetPortPin() gpio_analog.c
-2024/09/27  1.0.2       Jamie Starling  {FIX}Corrected Analog Input for GPIO_SetDirection() gpio.c
-2024/09/27  1.0.3       Jamie Starling  {UPDATE}gpio_analog.c GPIO_Analog_SetPortPin() to use PIO_SetDirection()
-2024/10/02  1.0.1       Jamie Starling  {UPDATE}Moved HAL Enable/Disable Directives to the device config header files.
-2024/10/03  1.0.2       Jamie Starling  {FIX}Corrected delay.c to check input value if less than min delay - set delay to min value.
-2024/10/03  1.0.3       Jamie Starling  {FIX}Corrected Analog Input for GPIO_SetDirection() gpio.c
+
+

@@ -46,8 +46,8 @@
 //#define _CORE18_MCU
 
 #define _CORE_VERSION_MAJOR 1
-#define _CORE_VERSION_MINOR 0
-#define _CORE_VERSION_PATCH 0
+#define _CORE_VERSION_MINOR 10
+#define _CORE_VERSION_PATCH 1
 
 #endif /*_CORE_MCU_VERSION_H*/
 

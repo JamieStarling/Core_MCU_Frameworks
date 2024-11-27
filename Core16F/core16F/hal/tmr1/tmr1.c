@@ -138,7 +138,7 @@ uint8_t TMR1_Get_8bit_Value(void)
 *******************************************************************************/
 uint16_t TMR1_Get_16bit_Value(void)
 {
-  return CORE16F_Make_16(TMR1H,TMR1L); // Combine high and low bytes into 16-bit value
+  return CORE.Make16(TMR1H,TMR1L); // Combine high and low bytes into 16-bit value
 }
 
 /******************************************************************************
